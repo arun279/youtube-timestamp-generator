@@ -6,7 +6,7 @@ AI-powered tool to generate detailed, accurate timestamps for YouTube videos usi
 
 - 🎯 **Accurate Timestamps**: Chunks videos intelligently with absolute timestamp generation
 - ⚡ **Dynamic Rate Limiting**: AIMD algorithm adapts to API limits automatically
-- 🔒 **Secure**: Client-side API key storage (sessionStorage/localStorage)
+- 🔒 **BYOK (Bring Your Own Key)**: Client-side API key storage (sessionStorage/localStorage), no server-side data storage
 - 📊 **Real-time Progress**: Live updates via Server-Sent Events
 - 🎨 **Modern UI**: Built with Next.js 15, Tailwind CSS, and shadcn/ui
 - 🐳 **Docker-First**: Single command to run, zero local installs required
@@ -171,6 +171,8 @@ services:
 - **RPM**: 15 requests per minute
 - **RPD**: 250 requests per day
 
+> **For more details, see the official Gemini API Rate Limits documentation: [https://ai.google.dev/gemini-api/docs/rate-limits](https://ai.google.dev/gemini-api/docs/rate-limits)**
+
 The app automatically:
 - Detects rate limits (429 errors)
 - Reduces concurrency (multiplicative decrease)
@@ -300,6 +302,8 @@ If persistent:
 - Lower FPS (reduces tokens per chunk)
 - Increase chunk size (fewer API calls)
 - Check remaining quota in AI Studio
+
+> For details on official Gemini API rate limits, see: [https://ai.google.dev/gemini-api/docs/rate-limits](https://ai.google.dev/gemini-api/docs/rate-limits)
 
 ### Port 3000 Already in Use
 
