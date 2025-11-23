@@ -1,0 +1,31 @@
+# Dependencies
+node_modules
+
+# Next.js
+.next
+dist
+web/src/lib/prompts/defaults.ts
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts & development docs
+docs/
+images/
+
+# Python
+*.pyc
+__pycache__/
+
