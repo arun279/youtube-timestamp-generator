@@ -94,6 +94,9 @@ export async function analyzeChunk(
   // Inject chunk start offset into prompt template
   const contextualizedPrompt = prompt.replace(/{{CHUNK_START_OFFSET}}/g, startOffsetSeconds.toString());
 
+  console.log(`[analyzeChunk] Processing chunk: ${startOffset} to ${endOffset} (video: ${videoUrl.substring(0, 50)}...)`);
+  console.log(`[analyzeChunk] Chunk start offset: ${startOffsetSeconds}s, FPS: ${fps}, Model: ${model}`);
+
   // Upload video with chunk offsets and FPS
   // NOTE: videoMetadata is critical for chunking - without it, Gemini tries to load the entire video!
   // Type assertion needed because SDK types don't include videoMetadata yet (but it works at runtime per docs)
@@ -119,7 +122,11 @@ export async function analyzeChunk(
   
   // Parse and validate with Zod
   const json = JSON.parse(text);
-  return ChunkAnalysisSchema.parse(json);
+  const parsed = ChunkAnalysisSchema.parse(json);
+  
+  console.log(`[analyzeChunk] Gemini returned ${parsed.events.length} events for chunk ${startOffset}-${endOffset}`);
+  
+  return parsed;
 }
 
 /**

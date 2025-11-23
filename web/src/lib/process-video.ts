@@ -60,6 +60,14 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
 
           const processingTime = Date.now() - startTime;
 
+          // Validate that the result has actual events
+          // Empty results indicate API failure or invalid chunk data
+          if (!result.events || result.events.length === 0) {
+            const errorMessage = `Chunk ${chunk.id} returned empty result (no events found). This usually indicates an API issue or invalid video segment.`;
+            console.error(`[${jobId}]`, errorMessage);
+            throw new Error(errorMessage);
+          }
+
           updateChunkStatus(jobId, chunk.id, 'completed', result, undefined, processingTime);
 
           // Update token usage
@@ -71,7 +79,7 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
           );
           addTokensUsed(jobId, totalTokens);
 
-          console.log(`[${jobId}] Chunk ${chunk.id} completed in ${processingTime}ms`);
+          console.log(`[${jobId}] Chunk ${chunk.id} completed in ${processingTime}ms with ${result.events.length} events`);
 
           return result;
         } catch (error) {
