@@ -317,10 +317,6 @@ This was a known issue and has been fixed:
 - Consolidation enforces strict chronological sorting
 - If you still see issues, rebuild: `docker compose build --no-cache`
 
-## License
-
-MIT
-
 ## Contributing
 
 Contributions welcome! Please:
