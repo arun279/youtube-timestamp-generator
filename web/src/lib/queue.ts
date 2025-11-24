@@ -1,7 +1,7 @@
 /**
  * AIMD (Additive Increase, Multiplicative Decrease) Queue
  * Dynamically adjusts concurrency based on rate limit responses
- * 
+ *
  * Features:
  * - Starts at concurrency 1, gradually increases
  * - On 429 error, cuts concurrency in half and pauses
@@ -30,8 +30,13 @@ export class AIMDQueue {
   private readonly rpm: number;
   private readonly onConcurrencyChange?: (from: number, to: number, reason: string) => void;
   private readonly onRateLimit?: (retryAfterMs: number) => void;
-  private readonly onRetry?: (attempt: number, maxRetries: number, error: Error, metadata: unknown) => void;
-  
+  private readonly onRetry?: (
+    attempt: number,
+    maxRetries: number,
+    error: Error,
+    metadata: unknown
+  ) => void;
+
   // Retry tracking
   private retryCount = 0;
   private isPaused = false;
@@ -43,9 +48,9 @@ export class AIMDQueue {
     this.onConcurrencyChange = options.onConcurrencyChange;
     this.onRateLimit = options.onRateLimit;
     this.onRetry = options.onRetry;
-    
+
     this.currentConcurrency = AIMD_CONFIG.initialConcurrency;
-    
+
     this.queue = new PQueue({
       concurrency: this.currentConcurrency,
       interval: 60000, // 1 minute
@@ -70,51 +75,56 @@ export class AIMDQueue {
           }
 
           const result = await task();
-          
+
           // Success! Increase concurrency (Additive Increase)
           if (attempt === 0) {
             this.increaseConcurrency();
           }
-          
+
           // Reset retry counter on success
           this.retryCount = 0;
-          
+
           return result;
         } catch (error: unknown) {
           const isRateLimit = this.isRateLimitError(error);
-          
+
           if (isRateLimit) {
             // Extract Retry-After header if present
             const retryAfterMs = this.extractRetryAfter(error);
-            
+
             // Decrease concurrency (Multiplicative Decrease)
             this.decreaseConcurrency('Rate limit (429) detected');
-            
+
             // Pause queue
             this.isPaused = true;
             this.onRateLimit?.(retryAfterMs);
-            
+
             // Wait with exponential backoff + jitter
             const backoffMs = this.calculateBackoff(attempt, retryAfterMs);
             await this.sleep(backoffMs);
-            
+
             // Resume
             this.isPaused = false;
-            
+
             // Retry
             if (attempt < retries) {
               this.retryCount++;
               // Notify about retry attempt
-              this.onRetry?.(attempt + 1, retries, error instanceof Error ? error : new Error(String(error)), metadata);
+              this.onRetry?.(
+                attempt + 1,
+                retries,
+                error instanceof Error ? error : new Error(String(error)),
+                metadata
+              );
               continue;
             }
           }
-          
+
           // Non-rate-limit error or max retries exceeded
           throw error;
         }
       }
-      
+
       throw new Error('Max retries exceeded');
     }) as Promise<T>;
   }
@@ -125,15 +135,15 @@ export class AIMDQueue {
   private increaseConcurrency(): void {
     const oldConcurrency = this.currentConcurrency;
     const maxConcurrency = this.getMaxConcurrency();
-    
+
     if (this.currentConcurrency < maxConcurrency) {
       this.currentConcurrency = Math.min(
         this.currentConcurrency + AIMD_CONFIG.incrementStep,
         maxConcurrency
       );
-      
+
       this.queue.concurrency = this.currentConcurrency;
-      
+
       this.onConcurrencyChange?.(
         oldConcurrency,
         this.currentConcurrency,
@@ -147,19 +157,15 @@ export class AIMDQueue {
    */
   private decreaseConcurrency(reason: string): void {
     const oldConcurrency = this.currentConcurrency;
-    
+
     this.currentConcurrency = Math.max(
       Math.floor(this.currentConcurrency * AIMD_CONFIG.decrementMultiplier),
       AIMD_CONFIG.minConcurrency
     );
-    
+
     this.queue.concurrency = this.currentConcurrency;
-    
-    this.onConcurrencyChange?.(
-      oldConcurrency,
-      this.currentConcurrency,
-      reason
-    );
+
+    this.onConcurrencyChange?.(oldConcurrency, this.currentConcurrency, reason);
   }
 
   /**
@@ -197,7 +203,7 @@ export class AIMDQueue {
       if (match) {
         return Math.ceil(parseFloat(match[1]) * 1000); // Convert seconds to ms, round up
       }
-      
+
       // Try pattern 2: "retry-after: XX" (standard header format)
       match = error.message.match(/retry[- ]after[:\s]+(\d+)/i);
       if (match) {
@@ -220,7 +226,7 @@ export class AIMDQueue {
    * Sleep utility
    */
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -258,4 +264,3 @@ export class AIMDQueue {
     await this.queue.onIdle();
   }
 }
-

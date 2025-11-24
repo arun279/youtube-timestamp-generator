@@ -3,7 +3,15 @@
  * Separate module so it can be imported by both API routes and Server Actions
  */
 
-import { getJob, updateJobStatus, updateChunkStatus, updateConcurrency, addTokensUsed, setResult, setError } from './jobs';
+import {
+  getJob,
+  updateJobStatus,
+  updateChunkStatus,
+  updateConcurrency,
+  addTokensUsed,
+  setResult,
+  setError,
+} from './jobs';
 import { AIMDQueue } from './queue';
 import { analyzeChunk, consolidateChunks } from './gemini';
 import { DEFAULT_PROMPTS } from './prompts/defaults';
@@ -21,7 +29,9 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
     return;
   }
 
-  console.log(`[processVideoInBackground] Starting processing for job ${jobId} with ${job.chunks.length} chunks`);
+  console.warn(
+    `[processVideoInBackground] Starting processing for job ${jobId} with ${job.chunks.length} chunks`
+  );
 
   try {
     updateJobStatus(jobId, 'processing');
@@ -33,76 +43,84 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
       rpm: 15,
       onConcurrencyChange: (from, to, reason) => {
         updateConcurrency(jobId, to);
-        console.log(`[${jobId}] Concurrency: ${from} → ${to} (${reason})`);
+        console.warn(`[${jobId}] Concurrency: ${from} → ${to} (${reason})`);
       },
       onRateLimit: (retryAfterMs) => {
-        console.log(`[${jobId}] Rate limited. Retrying in ${retryAfterMs}ms`);
+        console.warn(`[${jobId}] Rate limited. Retrying in ${retryAfterMs}ms`);
       },
       onRetry: (attempt, maxRetries, error, metadata) => {
         if (metadata && typeof metadata === 'object' && 'chunkId' in metadata) {
           const chunkId = (metadata as { chunkId: number }).chunkId;
           updateChunkStatus(jobId, chunkId, 'retrying');
-          console.log(`[${jobId}] Chunk ${chunkId + 1} retry attempt ${attempt}/${maxRetries}: ${error.message}`);
+          console.warn(
+            `[${jobId}] Chunk ${chunkId + 1} retry attempt ${attempt}/${maxRetries}: ${error.message}`
+          );
         }
       },
     });
 
     // Process all chunks
-    const chunkPromises = job.chunks.map(chunk =>
-      queue.add(async () => {
-        updateChunkStatus(jobId, chunk.id, 'processing');
-        
-        const startTime = Date.now();
-        
-        try {
-          const result = await analyzeChunk(
-            apiKey,
-            job.config.videoUrl,
-            chunk.startOffset,
-            chunk.endOffset,
-            DEFAULT_PROMPTS.chunkAnalysis,
-            job.config.fps,
-            job.config.model
-          );
+    const chunkPromises = job.chunks.map((chunk) =>
+      queue.add(
+        async () => {
+          updateChunkStatus(jobId, chunk.id, 'processing');
 
-          const processingTime = Date.now() - startTime;
+          const startTime = Date.now();
 
-          // Validate that the result has actual events
-          // Empty results indicate API failure or invalid chunk data
-          if (!result.events || result.events.length === 0) {
-            const errorMessage = `Chunk ${chunk.id + 1} returned empty result (no events found). This usually indicates an API issue or invalid video segment.`;
-            console.error(`[${jobId}]`, errorMessage);
-            throw new Error(errorMessage);
+          try {
+            const result = await analyzeChunk(
+              apiKey,
+              job.config.videoUrl,
+              chunk.startOffset,
+              chunk.endOffset,
+              DEFAULT_PROMPTS.chunkAnalysis,
+              job.config.fps,
+              job.config.model
+            );
+
+            const processingTime = Date.now() - startTime;
+
+            // Validate that the result has actual events
+            // Empty results indicate API failure or invalid chunk data
+            if (!result.events || result.events.length === 0) {
+              const errorMessage = `Chunk ${chunk.id + 1} returned empty result (no events found). This usually indicates an API issue or invalid video segment.`;
+              console.error(`[${jobId}]`, errorMessage);
+              throw new Error(errorMessage);
+            }
+
+            updateChunkStatus(jobId, chunk.id, 'completed', result, undefined, processingTime);
+
+            // Update token usage
+            const duration = parseInt(chunk.endOffset) - parseInt(chunk.startOffset);
+            const { totalTokens } = calculateTokens(
+              duration,
+              job.config.fps,
+              job.config.resolution
+            );
+            addTokensUsed(jobId, totalTokens);
+
+            console.warn(
+              `[${jobId}] Chunk ${chunk.id + 1} completed in ${processingTime}ms with ${result.events.length} events`
+            );
+
+            return result;
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.error(`[${jobId}] Chunk ${chunk.id + 1} failed:`, errorMessage);
+            updateChunkStatus(jobId, chunk.id, 'error', undefined, errorMessage);
+            throw error;
           }
-
-          updateChunkStatus(jobId, chunk.id, 'completed', result, undefined, processingTime);
-
-          // Update token usage
-          const duration = parseInt(chunk.endOffset) - parseInt(chunk.startOffset);
-          const { totalTokens } = calculateTokens(
-            duration,
-            job.config.fps,
-            job.config.resolution
-          );
-          addTokensUsed(jobId, totalTokens);
-
-          console.log(`[${jobId}] Chunk ${chunk.id + 1} completed in ${processingTime}ms with ${result.events.length} events`);
-
-          return result;
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          console.error(`[${jobId}] Chunk ${chunk.id + 1} failed:`, errorMessage);
-          updateChunkStatus(jobId, chunk.id, 'error', undefined, errorMessage);
-          throw error;
-        }
-      }, undefined, { chunkId: chunk.id })
+        },
+        undefined,
+        { chunkId: chunk.id }
+      )
     );
 
     // Wait for all chunks to complete
     const results = await Promise.allSettled(chunkPromises);
 
     // Check if any chunks failed
-    const failedChunks = results.filter(r => r.status === 'rejected');
+    const failedChunks = results.filter((r) => r.status === 'rejected');
     if (failedChunks.length > 0) {
       console.error(`[${jobId}] ${failedChunks.length} chunks failed`);
       setError(jobId, `${failedChunks.length} chunks failed to process`);
@@ -112,13 +130,13 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
     // Extract successful results
     const chunkAnalyses = results
       .filter((r): r is PromiseFulfilledResult<ChunkAnalysis> => r.status === 'fulfilled')
-      .map(r => r.value);
+      .map((r) => r.value);
 
-    console.log(`[${jobId}] All chunks completed. Starting consolidation...`);
+    console.warn(`[${jobId}] All chunks completed. Starting consolidation...`);
 
     // Consolidate all chunks with retry logic
     updateJobStatus(jobId, 'consolidating');
-    
+
     const maxConsolidationRetries = 5;
     let consolidationAttempt = 0;
     let finalTimestamps: string | null = null;
@@ -134,7 +152,7 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
         break; // Success - exit retry loop
       } catch (error) {
         consolidationAttempt++;
-        
+
         if (consolidationAttempt > maxConsolidationRetries) {
           // Max retries exceeded
           throw error;
@@ -142,7 +160,7 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
 
         // Extract retry delay from error message
         let retryDelayMs = 1000 * Math.pow(2, consolidationAttempt); // Default exponential backoff
-        
+
         if (error instanceof Error) {
           // Try to parse Gemini's "retry in XX.XXs" format
           const match = error.message.match(/retry in ([\d.]+)s/i);
@@ -151,8 +169,10 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
           }
         }
 
-        console.log(`[${jobId}] Consolidation attempt ${consolidationAttempt} failed. Retrying in ${retryDelayMs}ms...`);
-        await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+        console.warn(
+          `[${jobId}] Consolidation attempt ${consolidationAttempt} failed. Retrying in ${retryDelayMs}ms...`
+        );
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
       }
     }
 
@@ -160,7 +180,7 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
       throw new Error('Consolidation failed after all retries');
     }
 
-    console.log(`[${jobId}] Consolidation complete. Job finished successfully.`);
+    console.warn(`[${jobId}] Consolidation complete. Job finished successfully.`);
     setResult(jobId, finalTimestamps);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -168,4 +188,3 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
     setError(jobId, errorMessage);
   }
 }
-

@@ -12,33 +12,23 @@ export async function POST(request: NextRequest) {
     const { jobId, apiKey } = await request.json();
 
     if (!jobId || !apiKey) {
-      return NextResponse.json(
-        { error: 'Missing jobId or apiKey' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing jobId or apiKey' }, { status: 400 });
     }
 
     // Get job from store
     const job = getJob(jobId);
     if (!job) {
-      return NextResponse.json(
-        { error: 'Job not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Job not found' }, { status: 404 });
     }
 
     // Start processing (don't await - run in background)
-    processVideoInBackground(jobId, apiKey).catch(error => {
+    processVideoInBackground(jobId, apiKey).catch((error) => {
       console.error(`[process-video] Error processing job ${jobId}:`, error);
     });
 
     return NextResponse.json({ success: true, jobId });
   } catch (error) {
     console.error('[process-video] Error:', error);
-    return NextResponse.json(
-      { error: 'Failed to start processing' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to start processing' }, { status: 500 });
   }
 }
-

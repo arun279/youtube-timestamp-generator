@@ -1,10 +1,10 @@
 /**
  * In-Memory Job Manager
  * Tracks processing jobs and their state
- * 
+ *
  * For MVP: Single-instance in-memory storage
  * For production: Replace with Redis for multi-instance support
- * 
+ *
  * IMPORTANT: In Next.js standalone mode, Server Actions and API Routes
  * may run in separate contexts. We use globalThis to ensure a single
  * shared instance across all runtime contexts.
@@ -15,7 +15,6 @@ import { JOB_CONFIG } from './constants';
 
 // Ensure jobs Map is truly global across all Next.js runtime contexts
 declare global {
-  // eslint-disable-next-line no-var
   var __jobsStore: Map<string, Job> | undefined;
 }
 
@@ -23,7 +22,7 @@ declare global {
 const jobs = globalThis.__jobsStore ?? new Map<string, Job>();
 if (!globalThis.__jobsStore) {
   globalThis.__jobsStore = jobs;
-  console.log('[jobs] Initialized global jobs store');
+  console.warn('[jobs] Initialized global jobs store');
 }
 
 // Export for debugging
@@ -37,16 +36,13 @@ let cleanupInterval: NodeJS.Timeout | null = null;
  */
 export function initializeJobCleanup(): void {
   if (cleanupInterval) return;
-  
+
   cleanupInterval = setInterval(() => {
     const now = Date.now();
-    
+
     for (const [jobId, job] of jobs.entries()) {
       // Remove completed/failed jobs older than retention period
-      if (
-        (job.status === 'completed' || job.status === 'failed') &&
-        job.endTime
-      ) {
+      if ((job.status === 'completed' || job.status === 'failed') && job.endTime) {
         const endTime = new Date(job.endTime).getTime();
         if (now - endTime > JOB_CONFIG.retentionMs) {
           jobs.delete(jobId);
@@ -68,7 +64,7 @@ export function createJob(
     id,
     status: 'pending',
     config,
-    chunks: chunks.map(chunk => ({
+    chunks: chunks.map((chunk) => ({
       ...chunk,
       status: 'pending',
       retryCount: 0,
@@ -81,9 +77,9 @@ export function createJob(
   };
 
   jobs.set(id, job);
-  
+
   addLog(id, 'info', `Job created with ${chunks.length} chunks`);
-  
+
   return job;
 }
 
@@ -93,7 +89,9 @@ export function createJob(
 export function getJob(id: string): Job | undefined {
   const job = jobs.get(id);
   if (!job) {
-    console.log(`[jobs.getJob] Job ${id} not found. Available jobs: ${Array.from(jobs.keys()).join(', ')}`);
+    console.warn(
+      `[jobs.getJob] Job ${id} not found. Available jobs: ${Array.from(jobs.keys()).join(', ')}`
+    );
   }
   return job;
 }
@@ -106,7 +104,7 @@ export function updateJobStatus(id: string, status: JobStatus): void {
   if (!job) return;
 
   job.status = status;
-  
+
   if (status === 'completed' || status === 'failed') {
     job.endTime = new Date().toISOString();
   }
@@ -128,23 +126,23 @@ export function updateChunkStatus(
   const job = jobs.get(jobId);
   if (!job) return;
 
-  const chunk = job.chunks.find(c => c.id === chunkId);
+  const chunk = job.chunks.find((c) => c.id === chunkId);
   if (!chunk) return;
 
   chunk.status = status;
-  
+
   if (result) {
     chunk.result = result;
   }
-  
+
   if (error) {
     chunk.error = error;
   }
-  
+
   if (processingTime) {
     chunk.processingTime = processingTime;
   }
-  
+
   if (status === 'retrying') {
     chunk.retryCount++;
     job.retriesCount++;
@@ -247,11 +245,11 @@ export function getJobStats(jobId: string): {
 
   return {
     total: job.chunks.length,
-    pending: job.chunks.filter(c => c.status === 'pending').length,
-    processing: job.chunks.filter(c => c.status === 'processing').length,
-    completed: job.chunks.filter(c => c.status === 'completed').length,
-    error: job.chunks.filter(c => c.status === 'error').length,
-    retrying: job.chunks.filter(c => c.status === 'retrying').length,
+    pending: job.chunks.filter((c) => c.status === 'pending').length,
+    processing: job.chunks.filter((c) => c.status === 'processing').length,
+    completed: job.chunks.filter((c) => c.status === 'completed').length,
+    error: job.chunks.filter((c) => c.status === 'error').length,
+    retrying: job.chunks.filter((c) => c.status === 'retrying').length,
   };
 }
 
@@ -275,4 +273,3 @@ export function deleteJob(id: string): void {
 export function clearAllJobs(): void {
   jobs.clear();
 }
-

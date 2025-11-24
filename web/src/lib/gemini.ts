@@ -14,7 +14,7 @@ export function createGeminiClient(apiKey: string) {
   if (typeof window !== 'undefined') {
     throw new Error('createGeminiClient() can only be called server-side');
   }
-  
+
   return new GoogleGenerativeAI(apiKey);
 }
 
@@ -41,61 +41,68 @@ export async function analyzeChunk(
         properties: {
           chunk_summary: {
             type: SchemaType.STRING,
-            description: 'A concise summary of the entire video segment.'
+            description: 'A concise summary of the entire video segment.',
           },
           events: {
             type: SchemaType.ARRAY,
             items: {
               type: SchemaType.OBJECT,
               properties: {
-                timestamp: { 
-                  type: SchemaType.STRING, 
-                  description: 'HH:MM:SS format with leading zeros' 
+                timestamp: {
+                  type: SchemaType.STRING,
+                  description: 'HH:MM:SS format with leading zeros',
                 },
-                type: { 
+                type: {
                   type: SchemaType.STRING,
                   enum: [
-                    'Main Topic', 
-                    'Sub-topic', 
-                    'Sponsor', 
-                    'Merch', 
-                    'Banter', 
-                    'Technical', 
-                    'Intro', 
-                    'Outro', 
-                    'Speaker Change', 
-                    'Discussion Point'
-                  ]
+                    'Main Topic',
+                    'Sub-topic',
+                    'Sponsor',
+                    'Merch',
+                    'Banter',
+                    'Technical',
+                    'Intro',
+                    'Outro',
+                    'Speaker Change',
+                    'Discussion Point',
+                  ],
                 },
                 title: { type: SchemaType.STRING },
-                description: { 
+                description: {
                   type: SchemaType.STRING,
-                  description: 'Detailed summary with specific names, numbers, quotes'
+                  description: 'Detailed summary with specific names, numbers, quotes',
                 },
                 visual_context: { type: SchemaType.STRING },
-                speaker: { 
+                speaker: {
                   type: SchemaType.STRING,
-                  description: 'Name of speaker if identifiable'
-                }
+                  description: 'Name of speaker if identifiable',
+                },
               },
-              required: ['timestamp', 'type', 'title', 'description']
-            }
-          }
+              required: ['timestamp', 'type', 'title', 'description'],
+            },
+          },
         },
-        required: ['chunk_summary', 'events']
-      }
-    }
+        required: ['chunk_summary', 'events'],
+      },
+    },
   });
 
   // Parse chunk start offset to inject into prompt
   // e.g., "1500s" → 1500
   const startOffsetSeconds = parseInt(startOffset.replace('s', ''));
-  
-  // Inject chunk start offset into prompt template
-  const contextualizedPrompt = prompt.replace(/{{CHUNK_START_OFFSET}}/g, startOffsetSeconds.toString());
 
-  console.log(`[analyzeChunk] Processing chunk: ${startOffset} to ${endOffset} (video: ${videoUrl.substring(0, 50)}...)`);
-  console.log(`[analyzeChunk] Chunk start offset: ${startOffsetSeconds}s, FPS: ${fps}, Model: ${model}`);
+  // Inject chunk start offset into prompt template
+  const contextualizedPrompt = prompt.replace(
+    /{{CHUNK_START_OFFSET}}/g,
+    startOffsetSeconds.toString()
+  );
+
+  console.warn(
+    `[analyzeChunk] Processing chunk: ${startOffset} to ${endOffset} (video: ${videoUrl.substring(0, 50)}...)`
+  );
+  console.warn(
+    `[analyzeChunk] Chunk start offset: ${startOffsetSeconds}s, FPS: ${fps}, Model: ${model}`
+  );
 
   // Upload video with chunk offsets and FPS
   // NOTE: videoMetadata is critical for chunking - without it, Gemini tries to load the entire video!
@@ -104,28 +111,31 @@ export async function analyzeChunk(
     {
       fileData: {
         mimeType: 'video/*', // Use video/* for YouTube URLs (per docs)
-        fileUri: videoUrl
+        fileUri: videoUrl,
       },
       videoMetadata: {
         startOffset: startOffset,
         endOffset: endOffset,
-        fps: fps // Custom frame rate (e.g., 0.5 = 1 frame every 2 seconds)
-      }
+        fps: fps, // Custom frame rate (e.g., 0.5 = 1 frame every 2 seconds)
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any, // Type assertion: SDK types incomplete but API supports this (see docs/gemini/video-understanding.md)
     {
-      text: contextualizedPrompt
-    }
+      text: contextualizedPrompt,
+    },
   ]);
 
   const response = result.response;
   const text = response.text();
-  
+
   // Parse and validate with Zod
   const json = JSON.parse(text);
   const parsed = ChunkAnalysisSchema.parse(json);
-  
-  console.log(`[analyzeChunk] Gemini returned ${parsed.events.length} events for chunk ${startOffset}-${endOffset}`);
-  
+
+  console.warn(
+    `[analyzeChunk] Gemini returned ${parsed.events.length} events for chunk ${startOffset}-${endOffset}`
+  );
+
   return parsed;
 }
 
@@ -143,29 +153,33 @@ export async function consolidateChunks(
     model,
     generationConfig: {
       maxOutputTokens: 65536, // Increase from default 8192 to support long videos
-    }
+    },
   });
 
   // Prepare input for consolidation
   const chunksJson = JSON.stringify(chunkAnalyses, null, 2);
-  
+
   const fullPrompt = `${prompt}\n\n<chunk_data>\n${chunksJson}\n</chunk_data>`;
 
-  console.log(`[consolidateChunks] Processing ${chunkAnalyses.length} chunks, input size: ${fullPrompt.length} chars`);
+  console.warn(
+    `[consolidateChunks] Processing ${chunkAnalyses.length} chunks, input size: ${fullPrompt.length} chars`
+  );
 
   const result = await generativeModel.generateContent(fullPrompt);
   const responseText = result.response.text();
-  
+
   // Log finish reason and token usage for debugging
   const candidate = result.response.candidates?.[0];
-  console.log(`[consolidateChunks] Finish reason: ${candidate?.finishReason || 'unknown'}`);
-  console.log(`[consolidateChunks] Output length: ${responseText.length} chars`);
-  
+  console.warn(`[consolidateChunks] Finish reason: ${candidate?.finishReason || 'unknown'}`);
+  console.warn(`[consolidateChunks] Output length: ${responseText.length} chars`);
+
   // Warn if output seems suspiciously short (< 1000 chars for multi-chunk videos)
   if (chunkAnalyses.length > 5 && responseText.length < 1000) {
-    console.warn(`[consolidateChunks] WARNING: Output suspiciously short (${responseText.length} chars for ${chunkAnalyses.length} chunks)`);
+    console.warn(
+      `[consolidateChunks] WARNING: Output suspiciously short (${responseText.length} chars for ${chunkAnalyses.length} chunks)`
+    );
   }
-  
+
   return responseText;
 }
 
@@ -175,18 +189,14 @@ export async function consolidateChunks(
  */
 export async function listModels(apiKey: string): Promise<string[]> {
   const genAI = createGeminiClient(apiKey);
-  
+
   try {
     // Make a simple test request to validate the key
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     await model.generateContent('test');
-    
+
     // If successful, return common model names available on free tier (v1beta API)
-    return [
-      'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-2.5-pro',
-    ];
+    return ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-pro'];
   } catch (error) {
     throw new Error(`Failed to validate API key: ${error}`);
   }
@@ -205,11 +215,13 @@ export async function detectTier(
 
   try {
     // Send 3 rapid test requests to check rate limits
-    const probes = Array(3).fill(null).map(async () => {
-      const start = Date.now();
-      await model.generateContent('test');
-      return Date.now() - start;
-    });
+    const probes = Array(3)
+      .fill(null)
+      .map(async () => {
+        const start = Date.now();
+        await model.generateContent('test');
+        return Date.now() - start;
+      });
 
     const times = await Promise.all(probes);
     const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
@@ -226,9 +238,8 @@ export async function detectTier(
     if (error instanceof Error && error.message.includes('429')) {
       return { tier: 'free', tpm: 250_000, rpm: 15 };
     }
-    
+
     // Unknown error - default to free tier to be safe
     return { tier: 'unknown', tpm: 250_000, rpm: 15 };
   }
 }
-

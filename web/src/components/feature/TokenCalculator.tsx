@@ -36,10 +36,10 @@ export function TokenCalculator({
     );
 
     const totalTokens = calculateTokens(duration, fps, resolution).totalTokens;
-    
+
     // Calculate max chunks per minute based on tier limit
     const chunksPerMinute = tierLimit / tokensPerChunk;
-    
+
     // Check if within limits (use 80% safety margin)
     const withinLimit = tokensPerChunk < tierLimit * 0.8;
 
@@ -54,15 +54,19 @@ export function TokenCalculator({
   }, [duration, chunkSize, fps, resolution, tierLimit]);
 
   return (
-    <Card className={stats.withinLimit ? 'border-green-200 bg-green-50' : 'border-yellow-200 bg-yellow-50'}>
+    <Card
+      className={
+        stats.withinLimit ? 'border-green-200 bg-green-50' : 'border-yellow-200 bg-yellow-50'
+      }
+    >
       <CardContent className="pt-4">
         <div className="flex items-start gap-3">
           {stats.withinLimit ? (
-            <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
           ) : (
-            <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600" />
           )}
-          
+
           <div className="flex-1 space-y-2">
             <div className="flex items-baseline gap-2">
               <span className="text-sm font-semibold">
@@ -72,36 +76,26 @@ export function TokenCalculator({
 
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
               <div className="text-muted-foreground">Tokens/Chunk:</div>
-              <div className="font-medium">
-                ~{stats.tokensPerChunk.toLocaleString()}
-              </div>
+              <div className="font-medium">~{stats.tokensPerChunk.toLocaleString()}</div>
 
               <div className="text-muted-foreground">Total Tokens:</div>
-              <div className="font-medium">
-                ~{stats.totalTokens.toLocaleString()}
-              </div>
+              <div className="font-medium">~{stats.totalTokens.toLocaleString()}</div>
 
               <div className="text-muted-foreground">Tier Limit:</div>
-              <div className="font-medium">
-                {tierLimit.toLocaleString()} TPM
-              </div>
+              <div className="font-medium">{tierLimit.toLocaleString()} TPM</div>
 
               <div className="text-muted-foreground">Chunks:</div>
-              <div className="font-medium">
-                {stats.numChunks}
-              </div>
+              <div className="font-medium">{stats.numChunks}</div>
 
-              <div className="text-muted-foreground flex items-center gap-1">
-                <Zap className="w-3 h-3" />
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Zap className="h-3 w-3" />
                 Throughput:
               </div>
-              <div className="font-medium">
-                ~{stats.chunksPerMinute} chunks/min
-              </div>
+              <div className="font-medium">~{stats.chunksPerMinute} chunks/min</div>
             </div>
 
             {!stats.withinLimit && (
-              <p className="text-xs text-yellow-700 mt-2">
+              <p className="mt-2 text-xs text-yellow-700">
                 Consider reducing chunk size, FPS, or using low resolution to stay within limits
               </p>
             )}
@@ -111,4 +105,3 @@ export function TokenCalculator({
     </Card>
   );
 }
-

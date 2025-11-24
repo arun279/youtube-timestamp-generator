@@ -64,16 +64,14 @@ export function ApiKeyOnboarding({ onSuccess }: ApiKeyOnboardingProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-2">
-            <Key className="w-6 h-6 text-primary" />
+            <Key className="h-6 w-6 text-primary" />
             <CardTitle className="text-2xl">Welcome</CardTitle>
           </div>
-          <CardDescription>
-            Enter your Gemini API key to get started
-          </CardDescription>
+          <CardDescription>Enter your Gemini API key to get started</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* API Key Input */}
@@ -102,18 +100,15 @@ export function ApiKeyOnboarding({ onSuccess }: ApiKeyOnboardingProps) {
               onCheckedChange={(checked) => setPersist(checked === true)}
               disabled={isValidating}
             />
-            <Label
-              htmlFor="persist"
-              className="text-sm font-normal cursor-pointer"
-            >
+            <Label htmlFor="persist" className="cursor-pointer text-sm font-normal">
               Remember this key (store in localStorage)
             </Label>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-              <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-3">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
               <p className="text-sm text-destructive">{error}</p>
             </div>
           )}
@@ -126,35 +121,28 @@ export function ApiKeyOnboarding({ onSuccess }: ApiKeyOnboardingProps) {
           >
             {isValidating ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Validating...
               </>
             ) : (
               <>
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="h-4 w-4" />
                 Validate & Continue
               </>
             )}
           </Button>
 
           {/* Help Text */}
-          <div className="pt-4 border-t space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Don&apos;t have a key?
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              asChild
-            >
+          <div className="space-y-2 border-t pt-4">
+            <p className="text-sm text-muted-foreground">Don&apos;t have a key?</p>
+            <Button variant="outline" size="sm" className="w-full" asChild>
               <a
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Get a free API key from AI Studio
-                <ExternalLink className="w-3 h-3" />
+                <ExternalLink className="h-3 w-3" />
               </a>
             </Button>
           </div>
@@ -163,4 +151,3 @@ export function ApiKeyOnboarding({ onSuccess }: ApiKeyOnboardingProps) {
     </div>
   );
 }
-

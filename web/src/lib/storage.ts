@@ -25,7 +25,7 @@ export const ApiKeyStorage = {
   ): Promise<void> {
     const hash = await hashString(key);
     const storage = persist ? localStorage : sessionStorage;
-    
+
     const stored: StoredApiKey = {
       key,
       hash,
@@ -182,4 +182,3 @@ export function getServerApiKey(): string | undefined {
   }
   return process.env.GEMINI_API_KEY;
 }
-

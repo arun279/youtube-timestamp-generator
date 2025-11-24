@@ -17,20 +17,14 @@ interface PromptDefaults {
 }
 
 function loadPrompts(): PromptDefaults {
-  console.log('[load-prompts] Loading prompts from:', PROMPTS_DIR);
-  
-  try {
-    const chunkAnalysis = readFileSync(
-      join(PROMPTS_DIR, 'chunk_analysis_prompt.md'),
-      'utf-8'
-    );
-    const consolidation = readFileSync(
-      join(PROMPTS_DIR, 'consolidation_prompt.md'),
-      'utf-8'
-    );
+  console.warn('[load-prompts] Loading prompts from:', PROMPTS_DIR);
 
-    console.log('[load-prompts] ✓ chunk_analysis_prompt.md:', chunkAnalysis.length, 'chars');
-    console.log('[load-prompts] ✓ consolidation_prompt.md:', consolidation.length, 'chars');
+  try {
+    const chunkAnalysis = readFileSync(join(PROMPTS_DIR, 'chunk_analysis_prompt.md'), 'utf-8');
+    const consolidation = readFileSync(join(PROMPTS_DIR, 'consolidation_prompt.md'), 'utf-8');
+
+    console.warn('[load-prompts] ✓ chunk_analysis_prompt.md:', chunkAnalysis.length, 'chars');
+    console.warn('[load-prompts] ✓ consolidation_prompt.md:', consolidation.length, 'chars');
 
     return { chunkAnalysis, consolidation };
   } catch (error) {
@@ -53,23 +47,22 @@ export type PromptType = keyof typeof DEFAULT_PROMPTS;
 }
 
 function main() {
-  console.log('[load-prompts] Starting prompt generation...');
-  
+  console.warn('[load-prompts] Starting prompt generation...');
+
   // Ensure output directory exists
   if (!existsSync(OUTPUT_DIR)) {
     mkdirSync(OUTPUT_DIR, { recursive: true });
-    console.log('[load-prompts] Created output directory:', OUTPUT_DIR);
+    console.warn('[load-prompts] Created output directory:', OUTPUT_DIR);
   }
 
   // Load and generate
   const prompts = loadPrompts();
   const typescript = generateTypeScript(prompts);
-  
+
   // Write output
   writeFileSync(OUTPUT_FILE, typescript, 'utf-8');
-  console.log('[load-prompts] ✓ Generated:', OUTPUT_FILE);
-  console.log('[load-prompts] Done!');
+  console.warn('[load-prompts] ✓ Generated:', OUTPUT_FILE);
+  console.warn('[load-prompts] Done!');
 }
 
 main();
-
