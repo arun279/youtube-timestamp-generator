@@ -6,3 +6,4 @@ build/
 package-lock.json
 web/src/lib/constants.ts
 Dockerfile
+prompts/
