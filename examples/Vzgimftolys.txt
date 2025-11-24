@@ -1,0 +1,371 @@
+Timestamps
+[0:00] Chapters.
+[0:19] Topic #1: Linus's iPhone Purchase for AirDrop becomes Obsolete with Pixel Announcement.
+   > 0:51 AirPods Features on Android.
+[1:03] Topic #2: Drama in the Pebble Community.
+[1:39] Topic #3: Microsoft Kills Windows Activation Workaround; Linux Gains Traction.
+[1:56] Sponsors.
+   > 1:56 Dell Technologies.
+   > 2:18 Animated WAN Show Intro & Sponsors.
+   > 2:44 Secretlab.
+[3:04] Topic #4: Google Brings AirDrop-Like Functionality to Pixel 10 Family.
+   > 4:09 Android's Quick Share VS Apple's AirDrop.
+   > 4:50 Linus's 'iPhone for No Reason' Experience.
+   > 5:35 Luke's Event Experiences & Social Circles.
+   > 6:44 iOS 16 Bugginess & AirPods Issues.
+   > 7:28 Pixel 9a Bugginess & Killer App.
+   > 9:05 Quick Share is a Pixel OS Feature, Not General Android.
+   > 10:50 Apple's Potential Response to Quick Share Interoperability.
+   > 12:49 Discussion: Should Linus Make a 'No Reason iPhone' Video?
+   > 14:12 Linus's Follow-up Phone Challenge Idea.
+   > 15:00 Checking in on Phone Switchers.
+   > 15:21 Reasons for Not Switching Back to Android.
+   > 15:37 Yvonne's Productivity Needs Favor Android in Office.
+   > 15:54 iOS VS Android Feature Preference.
+   > 16:51 Muting Phone without Screen Interaction.
+   > 17:22 iOS Action Button & Volume Controls.
+   > 18:18 Android's Intuitive Volume Management.
+[19:05] Topic #5: The Cloudflare Outage & Centralized Internet Infrastructure.
+   > 19:50 Inherent Reliance on Major Cloud Providers.
+   > 20:30 Lessons from Past Outages.
+   > 21:13 Cost of Self-Hosting VS Cloud Benefits.
+   > 21:40 The Hybrid Cloud Model.
+   > 22:20 The Inevitable Centralization & Cost of Attacks.
+   > 23:23 Operation WRT Hug: Hacked 'Dad Routers' as Relays.
+   > 25:02 Cloudflare's Business Model: Massive Scale to Absorb Attacks.
+   > 27:07 The Simplicity of Centralized Services & Up-time.
+   > 28:13 Luke's Sore Lips.
+   > 28:40 Shrugging Off Major Outages.
+   > 30:00 Blaming Internet Outages on Large Companies.
+[30:44] Topic #6: Cloudflare Outage (November 2023).
+   > 31:36 Recent High-Profile Outages.
+   > 31:55 Technical Cause of Cloudflare Outage.
+   > 32:55 Anecdote on 'Insufficient Memory' T-shirt.
+   > 33:50 Companies Urged to Improve Redundancy.
+   > 35:20 Google Docs Zoom Feature Request.
+   > 35:49 Producer Dan is Missing.
+   > 36:00 Jokingly Misusing Production Controls.
+[45:00] Topic #7: LTT Socks: Features, Warranty & Customer Care.
+   > 45:00 Socks & blister issues.
+   > 45:14 LTT Socks features.
+[45:57] Merch Messages #1.
+   > 45:57 Excitement for LTT Socks launch.
+   > 46:01 Luke's LTT Store purchase struggles.
+   > 46:40 Linus as a difficult customer for socks.
+   > 47:43 Sock warranty discussion initiation.
+   > 48:00 Competitive sock warranties VS LTT's 'trust me bro' guarantee.
+   > 48:54 Backpack warranty recollection debate.
+   > 49:09 Actions VS written warranty for customer care.
+   > 49:50 Darn Tough sock warranty specifics.
+   > 50:46 LMG's commitment to warranty regardless of formal policy.
+   > 51:59 Backpack launch timeline revisited.
+   > 52:33 Darn Tough warranty details & LTT's stance.
+   > 53:49 Intention VS written policy in warranty.
+[1:00:00] Topic #8: Audience Reaction to Hypothetical Misconduct.
+   > 1:00:17 Revisiting 'Protecting Kids Online' & Consequences.
+   > 1:00:39 Emotional Reasons for Business Decisions & Long-Term Planning.
+   > 1:01:00 Debating 'Minimum Viable Product' VS Idealistic Goals.
+   > 1:01:21 Concept of a Warranty Trust Fund for Product Longevity.
+[1:01:44] Sponsors.
+   > 1:01:44 Dell Technologies: Work Smarter with AI-ready PCs.
+[1:01:53] Merch Messages #2.
+   > 1:01:53 Heat Gun Demonstration of Thermo-Reactive Jacket.
+   > 1:02:29 Should older SSDs/HDDs be replaced?
+   > 1:02:51 Thermo-Reactive Jacket Back-of-Chair Test.
+   > 1:03:19 Water Spray Test on Thermo-Reactive Jacket.
+   > 1:03:56 Thermo-Reactive Jacket as a 'Party Trick'.
+   > 1:04:14 Origin Story of the Thermo-Reactive Jacket.
+   > 1:04:39 Merch Message Introduction for New Viewers.
+   > 1:04:50 Thanks from Philippe B via Merch Message.
+   > 1:05:07 Customizable Screwdrivers.
+   > 1:05:37 Impact of New Energy on LTT Videos & Morale.
+   > 1:06:21 YouTube Algorithm & Video Performance Anomalies.
+   > 1:07:16 Inconsistent Video Performance & Audience Engagement.
+   > 1:07:37 Thanks for Screwdriver Purchase from Amine B.
+   > 1:07:44 Core Audience Videos Underperforming: 'Do Something About It'.
+   > 1:08:52 Thanks from Rebekah M for WAN Show Tuning.
+   > 1:09:04 Lost Drop Notification.
+[1:09:21] Topic #9: DDR5 RAM Pricing Doubling Rapidly.
+[1:09:49] Merch Messages #3.
+   > 1:09:49 Scrapyard Wars in Another Country?
+[1:10:07] Topic #10: Rising Component Costs & the Future of PC Building.
+[1:10:23] Topic #11: LTT's Future in PC Building Content Amid Rising Costs.
+[1:10:49] Merch Messages #4.
+   > 1:10:49 Balancing Productivity & Hobbies.
+   > 1:11:15 Short Circuit Revival & Hoodie Designs.
+[1:11:42] Topic #12: Consumer Market Shift: Spectacle VS Purchase Intent.
+[1:12:15] Topic #13: Consumer Spending Concentration & LMG's Reinvention.
+[1:15:00] Topic #14: Hardware Pricing & Content Strategy.
+   > 1:15:26 Past GPU Release Cycles.
+   > 1:15:50 Avoiding High-End Content.
+   > 1:16:00 Segmenting Content for Different Audiences.
+   > 1:17:05 Luke's 'Hot Take' on Content Strategy.
+   > 1:17:35 The 'Dead Zone' of PC Build Guides.
+   > 1:18:09 Pricing Volatility & Obsolete Content.
+   > 1:19:11 Black Friday PC Deals & Future Price Spikes.
+   > 1:19:39 Component Cost Evolution.
+   > 1:20:29 Sticker Shock & Hobby Abandonment.
+   > 1:21:54 Ideal Channel Design for Broad Audience.
+   > 1:22:17 Continuing Both High-End & Budget Content.
+   > 1:22:35 The Daily Upload Schedule.
+   > 1:23:45 New ShortCircuit Idea: Unboxing Plus Lab.
+   > 1:26:06 Snow Wars T-shirt.
+   > 1:26:35 Challenges of 'Unboxing Plus Lab' Format.
+[1:30:00] Topic #15: Scalability of expert hosts VS manufacturer specs.
+   > 1:31:04 Consistency in video messaging.
+   > 1:31:35 Integrating multiple perspectives in one segment.
+   > 1:32:24 "Unboxing plus a thing" video production model.
+   > 1:33:40 Battery testing delays in production.
+   > 1:34:39 Challenges of fragmented video production.
+   > 1:35:53 Audience coaching & content variety.
+   > 1:36:00 Avoiding cookie-cutter content.
+   > 1:36:46 Stylistic consistency in video production.
+   > 1:37:35 Production strategy for ShortCircuit.
+   > 1:37:56 Revisiting old LTT content.
+   > 1:41:51 Cross-channel product launch strategy.
+   > 1:44:15 Content overlap & channel cannibalization.
+   > 1:44:57 Evolving production processes.
+[1:45:18] Topic #16: LTT Lab's Initial Vision for Product Acquisition & Testing.
+   > 1:45:00 LTT ShortCircuit Product Testing Flow.
+   > 1:45:34 LTT Lab's Initial Vision for Product Acquisition & Testing.
+   > 1:47:04 Scaling Product Verticals & Dedicated Channels.
+   > 1:47:36 Informed Unboxing Concept for ShortCircuit.
+   > 1:48:29 Challenges with Lab Testing Vision - Complex Devices.
+[1:49:44] Topic #17: Mistake of Branching into Too Many Verticals.
+   > 1:50:09 Viability of GPU & CPU Databases.
+   > 1:50:50 Digging Through 'Rough' to Find 'Diamonds'.
+   > 1:51:15 Parallelizing Testing Workflow Challenges.
+   > 1:52:45 Cloning Lucas.
+[1:53:39] Topic #18: Re-evaluating Entire Systems & Workflows.
+   > 1:55:04 MacBook M-series Video Example - Performance VS Features.
+   > 1:56:46 Order of Operations for Product Reviews: Objective first, then Subjective.
+   > 1:59:52 Who Owns What in LMG.
+[2:00:00] Topic #19: Transparent PC builds & RGB aesthetics.
+   > 2:00:25 Acrylic desk & monitor discussion.
+   > 2:00:45 Workflow dilemma: Labs VS personal impressions.
+   > 2:01:36 Nick Ploof & Whale LAN monitor.
+   > 2:02:18 Roccat monitor carrying bags.
+   > 2:02:34 Labs necessity for phone controllers VS gaming.
+[2:03:23] Topic #20: Floatplane exclusives & Linus Torvalds collab video.
+   > 2:04:39 Deepfake video collaboration with Anne Hathaway.
+   > 2:07:53 Deepfake audio & Boston accent.
+[2:08:00] Topic #21: 'That Isn't Me - Deepfake 2025' video announcement.
+   > 2:08:59 Floatplane early access & publishing.
+   > 2:09:08 Analysis of Anne Hathaway deepfake image.
+   > 2:09:34 Deepfakes & ethical implications.
+[2:15:00] Topic #22: Deepfake Video - Linus morphs into David.
+   > 2:15:04 Deepfake Video - David carries Linus, then morphs.
+   > 2:15:09 Deepfake Video - Linus pushes David through door.
+   > 2:15:13 Deepfake Video - Linus tears shirt & takes pill.
+   > 2:15:18 Hosts react to Deepfake Video.
+   > 2:15:35 Highlighting Deepfake Advancement.
+   > 2:15:57 Debate on Perfect Deepfakes.
+   > 2:16:20 Burden of Proof in Deepfakes.
+   > 2:17:02 James' Theater Room Claim.
+   > 2:17:24 Sammy's Exclusion Joke.
+   > 2:17:54 Google Docs Access Issue.
+[2:18:00] Topic #23: Floatplane Price Increase Announcement.
+[2:18:26] Sponsors.
+   > 2:18:26 Woojer Vest 4.
+   > 2:19:46 Squarespace.
+   > 2:20:17 Questioning Squarespace Ad Footage.
+   > 2:21:00 Luke gets Google Docs access.
+[2:21:22] Topic #24: Floatplane Price Increase Details.
+   > 2:22:02 Yearly Plan Grandfathering.
+[2:22:37] Topic #25: Reasons for Floatplane Price Increase: Clear Roadmap.
+[2:23:10] Topic #26: Reasons for Floatplane Price Increase: Strategic Timing.
+[2:23:40] Topic #27: Reasons for Floatplane Price Increase: Rising Costs & Investments.
+   > 2:24:26 OG Tier Policy Clarification.
+   > 2:25:26 Choosing Yourself Over Content.
+   > 2:25:51 OG Tier Origination.
+[2:30:00] Topic #28: Floatplane Subscription Payment Methods.
+   > 2:30:18 Floatplane Badge System Details.
+[2:31:20] Merch Messages #5.
+   > 2:31:20 Will temporary plan changes be possible on Floatplane?
+   > 2:31:57 Discussion about Vessel shirt & G-BOW shirt.
+[2:32:30] Topic #29: Pebble Smartwatch Ecosystem Dispute.
+   > 2:33:58 Rebble VS Core Devices: Data Ownership.
+   > 2:34:21 Core's Defense & Eric's Goal.
+[2:34:59] Topic #30: Microsoft to Appeal UK Software Resale Ruling.
+   > 2:37:25 Impact of Software Resale Ruling on Gaming.
+[2:45:00] Topic #31: Steam's 2-Hour Refund Policy as Game Rental.
+   > 2:45:12 Old-School Game Rental VS Steam's Refund Policy.
+   > 2:45:33 Maximizing Weekend Game Rentals in the Past.
+   > 2:45:55 Nostalgia for Past Gaming Era.
+   > 2:46:01 Potential Negative Impact of Easy Refunds on Gaming Industry.
+[3:00:00] Topic #32: Banter about feeling safe & body size.
+   > 3:00:30 Feeling safe regardless of size.
+[3:00:49] Topic #33: Microsoft kills Windows activation workaround.
+   > 3:01:37 Microsoft's 'Agentic OS' initiative.
+   > 3:02:06 Concerns about AI agents & system access.
+   > 3:02:46 Copilot makes users feel incompetent.
+   > 3:03:25 Ideal AI agent functionality & privacy tradeoffs.
+   > 3:06:02 Living a hyper-scheduled life with AI.
+   > 3:07:16 ADHD coping mechanism & shared calendars.
+   > 3:08:36 Local, air-gapped AI for home automation.
+[3:10:42] Topic #34: Flock Safety's vulnerable license plate cameras.
+   > 3:11:09 Flock Safety accounts sold on Dark Web.
+   > 3:11:54 Exploiting Flock cameras for full control.
+   > 3:15:00 Flock Camera Vulnerabilities: Physical Access & Keystroke Injection.
+   > 3:17:47 Flock Camera Vulnerabilities: Debugging Enabled Apps.
+   > 3:19:39 Flock Camera Vulnerabilities: Hardcoded Wi-Fi Networks & Traffic Interception.
+   > 3:25:21 Banter: Intentional Vulnerabilities & Losing the Ability to 'Can'.
+   > 3:26:07 Flock Camera Vulnerabilities: Exposed API Key & RF Signal Leakage.
+   > 3:28:40 Flock Camera Vulnerabilities: Calls for Investigation & Surveillance Atlas.
+   > 3:30:46 Banter: Birds as Government Surveillance & Vtubers as President.
+[3:33:34] Sponsors.
+   > 3:33:34 Proton Mail.
+[3:39:41] Sponsors.
+   > 3:39:41 FlexiSpot E7 Plus Standing Desk.
+[3:45:55] Topic #35: Masimo VS Apple Patent Infringement Lawsuit.
+   > 3:51:00 Discussion: Ethics of Employee Poaching.
+   > 3:30:00 Anti-Trust & Free Market Perspective.
+   > 3:30:11 Challenges of Anti-Trust Legislation.
+   > 3:30:50 Corporate Knowledge VS Employee Property.
+   > 3:31:28 Lawsuit for 'Husband Stealing' in Georgia.
+   > 3:32:34 Husband Poaching Legality Discussion.
+   > 3:33:50 Egg Puns & Relationship Status.
+[3:34:46] Topic #36: Tesla Considering Apple CarPlay Integration.
+   > 3:35:19 CarPlay & Android Auto as Essential Features.
+   > 3:35:44 Linus's Dislike for Tesla's Infotainment System.
+   > 3:36:51 Impact of Locked-Down Systems & Subscriptions.
+   > 3:38:28 Tesla's Influence as an Industry Leader.
+[3:40:17] Topic #37: Samsung Fridge Displays Ads.
+   > 3:41:21 LibrePods Project & Proprietary Lock-ins.
+   > 3:45:00 AirPods Love & Android Limitations.
+   > 3:45:38 True Cost of AirPods Pro 3 for full functionality.
+   > 3:45:57 Transition to New Topics.
+[3:46:01] Topic #38: Google Play Store to Flag High Battery Usage Apps.
+[3:47:05] Topic #39: UK Bans Reselling Tickets for Profit.
+   > 3:47:46 Ticket Reselling at Face Value Discussion.
+   > 3:48:04 Taylor Swift & Scalpers.
+[3:48:14] Topic #40: HP & Dell Disable HEVC/H.265 Support.
+   > 3:49:38 HEVC Licensing Issues & Alternatives.
+[3:50:11] Topic #41: After Dark: AI Bubble Speculation.
+   > 3:50:23 Nvidia Stock & Market Indicators.
+   > 3:53:32 Bitcoin Crash & Other Tech Stocks.
+   > 3:57:07 Roblox Stock Dip & Managed ETFs.
+   > 3:57:53 The Great Filter & Future Crises.
+[4:00:00] Topic #42: Hear Me Out: Ammunition.
+   > 4:00:07 Canned Food for Prepping.
+   > 4:00:10 Linus Town & Climate Wars.
+   > 4:00:21 Location of Linus Town.
+   > 4:00:34 Military Survival Chances.
+   > 4:00:47 Tech Yacht or Tech Plane for Apocalypse.
+   > 4:00:53 Outrunning the Sun in a Tech Plane.
+   > 4:01:07 Tech Lunar Base Idea.
+[4:01:17] Topic #43: Value of Gold in a Societal Meltdown.
+   > 4:01:38 Going Full Prepper.
+   > 4:01:47 Wikipedia as Post-Apocalyptic Currency.
+   > 4:02:04 Knowledge is Power (& better than bananas).
+   > 4:02:45 Currency & Trade After the Apocalypse.
+   > 4:02:57 USB Flash Drives with Wikipedia as Currency.
+   > 4:03:11 Knowledge with Pictures.
+   > 4:03:22 Classic Literature & Pelvic Bone Structures.
+   > 4:03:47 Porn & New Models in Apocalypse.
+   > 4:03:57 3D Printers & Recycled Filament.
+   > 4:04:16 LTT's Shallow Dive into Recycled Plastics.
+[4:04:29] Merch Messages #6.
+   > 4:04:29 Sock Warranty in an Apocalypse.
+   > 4:04:38 Apocalypse Continuation Plan.
+   > 4:04:46 Raider & Sock License.
+   > 4:04:54 Not Ready for Prepping.
+[4:05:03] Topic #44: Linus's Airbrake Certification for Firetruck.
+   > 4:05:07 Firetruck Service Intervals & Confusion.
+   > 4:05:20 Linus Goes to Washroom, Dan Takes Over.
+   > 4:05:24 WAN After Dark Transition.
+[4:05:30] Topic #45: AI in Games: Enhancing Player Experience.
+   > 4:05:35 AI Followers & Voice Commands.
+   > 4:05:41 Tailored VS 'Weird' AI Experiences.
+   > 4:05:51 AI for Interactive Commands (not story).
+   > 4:05:57 Linus Returns to his Seat.
+   > 4:06:06 Firetruck Super Cooler Condition.
+   > 4:06:12 Not Hopeful for Firetruck to 'Serve Us'.
+[4:06:20] Merch Messages #7.
+   > 4:06:20 Holiday Family Traditions Question.
+   > 4:06:22 Joseph's Amazing Technicolor Dreamcoat Colors.
+   > 4:06:32 Extended Dreamcoat Colors.
+   > 4:06:43 Great Musical.
+[4:15:00] Topic #46: Christmas Gift Opening Traditions: Slow & Deliberate.
+   > 4:15:20 Dog Involved in Gift Opening.
+   > 4:15:40 Lengthy Gift Exchange.
+[4:16:37] Merch Messages #8.
+   > 4:16:37 Unique Family Holiday Traditions.
+   > 4:16:56 Linus's Unique Christmas Living Room Decoration.
+   > 4:18:20 Apology for Disagreeing on Tradition's Uniqueness.
+   > 4:19:12 Snowflake Status Confirmed.
+[4:19:58] Topic #47: Being a Good Employee: Skills Beyond School.
+   > 4:20:35 Attitude VS Financial Value in Employees.
+   > 4:21:25 Importance of Culture & Proactive Solutions.
+   > 4:22:40 Good Employee = Good Person.
+   > 4:23:28 When to Exit a Toxic or Incompatible Workplace.
+[4:24:05] Topic #48: Son's Switch 2 & Money Management Lessons.
+   > 4:24:55 Limited Games for Switch 2.
+[4:25:33] Topic #49: Shockingly Expensive Everyday Items: Garbage Cans & Utensils.
+   > 4:26:04 Garbage Can Price Revelation.
+   > 4:27:00 Masking Tape Price Shock.
+[4:30:00] Topic #50: Inflation on Painter's Tape.
+   > 4:30:23 Mandatory AI Training for Employees.
+   > 4:31:29 Linus's Last Name & Family Origin.
+   > 4:31:58 Linus's Mixed Ancestry.
+   > 4:32:14 Concerns over Data Center Sprawl.
+   > 4:32:26 Praise for Socialized Healthcare.
+   > 4:32:42 Comparing Taxes & Data Centers to Healthcare.
+   > 4:33:00 Apple's Browser Lockdown & Antitrust Concerns.
+   > 4:33:15 Challenges in Tech Progress (CubeSat).
+[4:45:00] Topic #51: Pet ownership preferences.
+   > 4:45:08 Dog VS small dogs debate.
+   > 4:45:24 Joke about wealth & working.
+   > 4:46:14 Discussion on wealth & global brands.
+   > 4:46:48 The concrete plant owner's wealth.
+   > 4:47:35 Challenges of concrete production & illegal sand mining.
+   > 4:49:09 Logistical challenges of shipping bulky materials.
+[4:50:51] Merch Messages #9.
+   > 4:50:51 Merch Message on 'Sissport'.
+   > 4:52:13 Corolla experiment with Openpilot.
+   > 4:53:05 Openpilot software update issues.
+   > 4:53:40 LTT videos impacting vendor stock.
+[5:00:00] Topic #52: Casual LTT Things.
+   > 5:00:06 Nuking PopOS & Future 'Switching to Linux' Series.
+   > 5:00:13 Linux's Breakability Acknowledged by Linus Torvalds.
+   > 5:00:41 Emotional Detachment to Operating Systems, Attachment to Kernel.
+[5:00:54] Topic #53: Plans for a New 'Switching to Linux' Series & Steam Machine Build.
+   > 5:01:13 Floatplane Uptime 'Nines' Inquiry.
+   > 5:01:25 Floatplane Uptime Tracking History.
+   > 5:01:46 Team's Role in Floatplane's Current Stability.
+   > 5:02:22 Hypothetical Bandwidth Savings from Downtime.
+   > 5:03:00 Reliability as a Reputation Driver in Services.
+   > 5:03:41 Jonathan's Technical Contributions to Stability.
+   > 5:04:00 Linus's Playful Refusal to Share Technical Secrets.
+[5:04:30] Merch Messages #10.
+   > 5:04:30 Question: Steam Frame Lighthouse Full-Body Tracking.
+   > 5:05:04 Confirmation of Contact with Space Calibrator Developer.
+   > 5:05:18 Playful Debate about Purchasing Steam Frame.
+[5:05:35] Topic #54: The Pivotal Moment of Partnership: 'Right Choice' to Work Together.
+   > 5:06:00 Reflecting on Relationship Challenges & Growth.
+   > 5:06:30 Mutual Personal Growth & Understanding.
+   > 5:07:05 Ingrained Partnership: Hard to Remember Not Working Together.
+   > 5:07:37 The Value of Their Unique Collaboration.
+   > 5:08:42 The Daily 'Right Choice' Realization.
+   > 5:08:55 The 'Denny's Night' Story: A Defining Moment of Partnership.
+   > 5:09:59 Denny's Night: Instilling Confidence in Problem-Solving.
+   > 5:11:05 Commitment After External Opportunities.
+   > 5:12:03 The Irreplaceability of Their Partnership.
+   > 5:12:30 Impact of Personal Brand on Career Opportunities & AI Hiring.
+[5:15:00] Topic #55: Commitment to Friendship in Business.
+   > 5:15:18 Future Opportunities & Company Value.
+   > 5:15:47 Luke's Unlikely Acceptance of Offers.
+   > 5:15:54 Enjoying Work & Colleagues.
+   > 5:16:11 Life-Changing Impact of Work Environment.
+   > 5:16:17 Advice for Being a Good Colleague.
+   > 5:16:29 Injecting Positive Energy at Work.
+   > 5:16:53 Channel Growth Milestones.
+   > 5:17:25 Early Content Strategy & Mass Uploads.
+   > 5:17:59 Toblerone Unboxing for Content Quota.
+   > 5:18:10 Remembering Old Memories.
+   > 5:18:26 Linus's Memory & Backpack Warranty.
+[5:18:41] Merch Messages #11.
+   > 5:18:41 Kids waking up at night?
+   > 5:18:49 Answer: Discipline in Parenting for Sleep.
+   > 5:19:07 Joke: 'Our Bed Stuff'.
+[5:19:30] Outro.

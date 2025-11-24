@@ -11,6 +11,58 @@ AI-powered tool to generate detailed, accurate timestamps for YouTube videos usi
 - 🎨 **Modern UI**: Built with Next.js 15, Tailwind CSS, and shadcn/ui
 - 🐳 **Docker-First**: Single command to run, zero local installs required
 
+## Demo
+
+### Processing View
+
+Real-time progress with adaptive concurrency, chunk visualization, token usage tracking, and live event log showing AIMD rate limiting in action:
+
+![Processing View](docs/images/processing-view.png)
+
+### Results View
+
+Processing complete! Final timestamps with statistics (chunks processed, tokens used, retries) ready to copy or download:
+
+![Results View](docs/images/results-view.png)
+
+## Example Outputs
+
+See real-world examples of generated timestamps. Click the video links to compare with the actual content:
+
+### Example 1: WAN Show September 26, 2025 - [Watch Video](https://www.youtube.com/watch?v=TS1qrTc07v4)
+
+A 2.5-hour tech podcast with multiple topics, sponsors, and merch messages. [View Generated Timestamps →](examples/TS1qrTc07v4.txt)
+
+**Sample output:**
+```
+[0:00] Intro.
+[0:19] Topic #1: Introduction of Headline Topics.
+[1:43] Sponsors.
+   > 1:43 Corsair.
+   > 1:43 Factor.
+   > 1:43 Rove Lab.
+[2:15] Topic #2: Amazon's $2.5 Billion Prime Subscription Settlement.
+   > 3:23 FTC Action Against Amazon's Anti-Consumer Practices.
+   > 4:09 EU regulations impacting global tech products.
+```
+
+> **Note**: This example was generated using settings: 25-minute chunks, low resolution, 0.5 FPS on the free tier.
+
+### Example 2: WAN Show November 21, 2025 - [Watch Video](https://www.youtube.com/watch?v=Vzgimftolys)
+
+A 5.5-hour extended episode with 55+ topics, deep technical discussions, and extensive merch message segments. [View Generated Timestamps →](examples/Vzgimftolys.txt)
+
+**Sample output:**
+```
+[0:00] Chapters.
+[0:19] Topic #1: Linus's iPhone Purchase for AirDrop becomes Obsolete with Pixel Announcement.
+   > 0:51 AirPods Features on Android.
+[1:03] Topic #2: Drama in the Pebble Community.
+[1:39] Topic #3: Microsoft Kills Windows Activation Workaround; Linux Gains Traction.
+```
+
+> **Note**: This example was generated using settings: 15-minute chunks, low resolution, 1 FPS on the free tier.
+
 ## Quick Start
 
 ### Prerequisites
@@ -39,6 +91,17 @@ docker compose up
 ```bash
 docker compose down
 ```
+
+### Restart After Changes
+
+After modifying code, prompts, or dependencies:
+
+```bash
+docker compose down
+docker compose up --build
+```
+
+The `--build` flag rebuilds the image with your changes before starting.
 
 ## Usage
 
@@ -246,17 +309,22 @@ You can customize prompts by editing the markdown files in `prompts/`. Changes t
 
 ### Development Mode (Hot Reload)
 
+For active development with automatic file syncing:
+
 ```bash
 docker compose watch
 ```
 
-Changes sync automatically without rebuild.
+Code changes sync automatically without rebuild. Use this for rapid iteration.
+
+> **Note**: For dependency changes, Dockerfile modifications, or prompt updates, use `docker compose up --build` instead.
 
 ### Add NPM Package
 
 ```bash
 docker compose run --rm web npm install <package-name>
-docker compose build  # Rebuild image
+docker compose down
+docker compose up --build
 ```
 
 ### View Logs
@@ -279,10 +347,9 @@ docker compose exec web sh
 # Check logs
 docker compose logs web
 
-# Rebuild from scratch
+# Rebuild from scratch (clears all cache)
 docker compose down
-docker compose build --no-cache
-docker compose up
+docker compose up --build --no-cache
 ```
 
 ### API Key Invalid

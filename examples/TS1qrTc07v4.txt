@@ -1,0 +1,145 @@
+Timestamps
+[0:00] Intro.
+[0:19] Topic #1: Introduction of Headline Topics.
+[1:43] Sponsors.
+   > 1:43 Corsair.
+   > 1:43 Factor.
+   > 1:43 Rove Lab.
+   > 1:43 dbrand.
+   > 1:43 Dell.
+   > 1:43 Secretlab.
+[2:15] Topic #2: Amazon's $2.5 Billion Prime Subscription Settlement.
+   > 3:23 FTC Action Against Amazon's Anti-Consumer Practices.
+   > 4:09 EU regulations impacting global tech products.
+   > 5:13 Frustrations with UI Dark Patterns.
+   > 7:42 Microsoft Teams Login & UI Annoyances.
+   > 11:30 Teams destroying OLED monitors with unread message notifications.
+   > 12:51 Why companies use Microsoft Teams.
+   > 13:38 Microsoft Teams' communication flaws.
+[14:25] Topic #3: Microsoft's microfluidic cooling for AI accelerators.
+   > 15:53 LTT's direct-to-die cooling ambitions.
+[17:29] Topic #4: Simon Fraser University's 'Fur' Supercomputer.
+   > 18:49 Fur Supercomputer specs & liquid cooling.
+   > 23:18 Supercomputer cooling architecture.
+   > 25:00 SFU Supercomputer funding & partners.
+   > 25:30 Supercomputer water cooling design.
+   > 26:12 Supercomputer GPU node specs.
+   > 26:50 Nvidia H100 GPU cost & variants.
+   > 27:21 SFU Supercomputer project budget.
+   > 27:44 Decommissioning of old supercomputers.
+   > 28:25 Old supercomputer on eBay discussion.
+[29:45] Merch Messages #1.
+   > 30:07 New LTTStore Tall Shirt colors drop.
+   > 30:41 LTTStore Fall T-Shirt colors & reviews.
+   > 31:40 LTTStore Defrag Sale ending soon.
+   > 32:51 LTTStore Behind the Scenes newsletter.
+   > 33:23 How to submit a Merch Message.
+   > 34:08 Would LTT build a house?
+   > 34:22 Project management VS expertise: The Whale Land example.
+   > 35:50 Whale Lan event & home renovation experiences.
+   > 37:39 Overly specialized house features.
+   > 38:05 Plastic orbs in a ballroom.
+   > 38:15 Designing for resalability VS personal taste.
+   > 39:00 Whale Lan prep & border agent experience.
+   > 39:35 Kids growing up & time passing.
+   > 40:34 Gigabyte backplate issue recall.
+   > 42:30 Gigabyte's flawed backplates & marketing issues.
+   > 43:30 Technical accuracy VS marketing KPIs.
+   > 45:10 Marketing inaccuracies: malicious or misinformed?
+   > 46:34 Custom PC for Wintergatan & stickers.
+   > 47:57 Decline in popularity of themed PC builds.
+   > 49:10 Understanding YouTube analytics & aggregate data.
+   > 49:38 Scrapyard Wars.
+[50:00] Topic #5: Perception of LTT 'falling off'.
+   > 50:11 LTT viewership & conflicting audience opinions.
+   > 50:44 PC building content: competitive & saturated.
+   > 51:26 Adapting PC build content with unique angles.
+   > 52:25 NAS build content ideas & sponsorship.
+   > 53:57 Audience debate on 'outlandish expensive stuff' content.
+   > 54:55 LTT's diverse content strategy.
+   > 55:51 Increasing video length & production challenges.
+   > 57:57 Historical views on video length VS content density.
+[59:00] Topic #6: Google's Android PC & ChromeOS merger.
+   > 59:58 Android tablets: Cost, utility & market perception.
+   > 1:01:38 Google Pixel Tablet & review aggregation tactics.
+[1:02:53] Topic #7: Meta launches 'Vibes': an AI-generated video feed.
+[1:05:19] Topic #8: OpenAI's ChatGPT Pulse: Personal data for 'useful ads'.
+   > 1:08:18 ChatGPT Pulse is an ad engine.
+[1:08:45] Topic #9: OpenAI hiring for Ads Chief.
+[1:09:10] Topic #10: Floatplane exclusive content: ShortCircuit's office tour & Linus's 'Friend' video.
+[1:14:29] Sponsors.
+   > 1:14:29 Dell Technologies.
+[1:15:00] Topic #11: Linus's punctuality & staff Fridays off.
+[1:15:55] Sponsors.
+   > 1:15:55 Corsair.
+   > 1:16:55 Factor.
+   > 1:18:05 Rove Lab.
+[1:19:04] Topic #12: Rove Lab furniture experience.
+   > 1:19:57 Rove Lab couches are low to the ground.
+[1:20:03] Topic #13: Boosting WAN viewership with AI 'thirst traps'.
+   > 1:21:25 AI face-swapping tools discussion.
+   > 1:22:07 Luke's solution to low WAN viewership.
+[1:22:56] Topic #14: Chevrolet Volt & Toyota Charge Minder App.
+   > 1:26:18 Plug-in hybrids & cost VS usage.
+   > 1:26:40 Conspiracy about car manufacturers.
+[1:27:17] Topic #15: SpamGPT: AI-powered email attack kit.
+   > 1:28:42 SpamGPT VS Mailchimp.
+   > 1:31:07 Is direct human interaction with the internet dying? ft. Dead Internet Theory.
+[1:32:09] Topic #16: Linus Torvalds collaboration & viewer questions.
+[1:33:04] Topic #17: Google Messages cloud sync frustration.
+[1:35:59] Topic #18: Apple's broken migration & 'It Just Works' philosophy.
+   > 1:40:00 Frustration with iPhone data transfer & Apple support.
+   > 1:40:43 WhatsApp transfer issues & multi-device limitations.
+   > 1:41:23 Bad experiences with WhatsApp backup/restore & data loss.
+   > 1:42:20 Current phone data predicament & lack of cloud sync for SMS.
+   > 1:42:44 Linus's tech company 'to-do list'.
+   > 1:43:49 Apple's retry button philosophy.
+   > 1:44:02 WhatsApp multi-phone account update & QR code frustration.
+   > 1:44:59 Clarification on WhatsApp companion devices.
+   > 1:45:48 Luke's 'full Apple year' challenge suggestion.
+   > 1:46:33 Mac user archetype & desktop exception.
+   > 1:46:50 Linus rejects 'full Apple year' challenge.
+   > 1:51:30 iPhone VS Android transfer complete discrepancy.
+   > 1:52:28 Mismatched power warnings & MagSafe solution.
+   > 1:53:46 'Move to iOS' app transfer error (long-standing issue).
+   > 1:54:58 Holding companies accountable for accessory removal.
+   > 1:56:04 Lost iPhone accessories comparison.
+   > 1:57:41 Apple USB-C cable pricing & USB 2.0 speeds.
+   > 1:58:28 Beats headphones sound signature & AirPods Pro 3 design.
+   > 1:59:28 Unity in tech media to hold companies accountable.
+[2:02:22] Topic #19: Qualcomm Snapdragon X Elite processors.
+   > 2:02:39 Snapdragon X Elite specs & claims.
+   > 2:03:37 Frore AirJet reference design & liquid metal leak experience.
+   > 2:04:47 Qualcomm segment conclusion & banter.
+[2:05:00] Topic #20: AI-generated music & artist deals.
+   > 2:05:35 Valve under fire for malware-laden games on Steam.
+   > 2:06:37 Pirating games safety & water bottle antics.
+   > 2:06:54 Ascent Rivals & its crypto/NFT integrations.
+[2:08:14] Topic #21: Synology NAS models lose hardware transcoding capabilities.
+   > 2:08:46 HexOS NAS software & lifetime licensing.
+   > 2:12:23 End of main topics & transition to After Dark.
+   > 2:12:30 Dan 'checked out' on his phone.
+[2:13:11] Merch Messages #2.
+   > 2:13:11 Why do major companies have blatant UI errors?
+   > 2:14:41 Continued car UI complaints & Ford CEO's daily driver.
+   > 2:16:53 Excited for the mad rant!
+   > 2:17:19 Memories from Vancouver 2010 Olympics.
+   > 2:19:35 Should I stop trying in my tech management degree?
+   > 2:20:19 Luke, why are you cheap?
+   > 2:21:45 Tired of buying Orange Rivers, buying LTT cargo pants.
+   > 2:24:14 3D printed water cooling tube update.
+   > 2:24:48 Coolest LTT Backpack modifications.
+   > 2:26:25 If you had a $30,000 GPU, what would you use it for?
+   > 2:27:46 Does Floatplane participate in standards bodies like SVTA?
+   > 2:27:57 Best mobile backup experience?
+   > 2:28:09 Preparation for Whale Lan.
+   > 2:29:07 Picking material for new blanks.
+   > 2:29:43 Next generation gaming handheld features.
+[2:30:00] Merch Messages #3.
+   > 2:30:00 Do you ever miss having your cats on set?
+   > 2:31:44 Do you use Cloudflare's dev plan ZT features or just CDN & WAF?
+   > 2:33:49 Have you thought about whole room VR for the LAN side of the Badminton center?
+   > 2:34:51 What is your favourite tabletop/board game to play?
+   > 2:35:30 Player housing is coming back before Christmas! It's time to come home!
+   > 2:37:33 Ayyooo.
+[2:37:41] Outro.
