@@ -201,7 +201,7 @@ export function ProcessingView({ jobId, onComplete }: ProcessingViewProps) {
                       ? 'bg-yellow-500 text-white'
                       : 'bg-gray-200 text-gray-600'
                   }`}
-                  title={`Chunk ${chunk.id}: ${chunk.status}`}
+                  title={`Chunk ${chunk.id + 1}: ${chunk.status}`}
                 >
                   {chunk.id + 1}
                 </div>
@@ -218,7 +218,7 @@ export function ProcessingView({ jobId, onComplete }: ProcessingViewProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-1 max-h-64 overflow-y-auto font-mono text-xs">
-              {logs.slice(-20).map((log, i) => (
+              {logs.map((log, i) => (
                 <div
                   key={i}
                   className={`py-1 px-2 rounded ${

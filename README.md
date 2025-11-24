@@ -29,9 +29,32 @@ Processing complete! Final timestamps with statistics (chunks processed, tokens 
 
 See real-world examples of generated timestamps. Click the video links to compare with the actual content:
 
-### Example 1: WAN Show September 26, 2025 - [Watch Video](https://www.youtube.com/watch?v=TS1qrTc07v4)
+---
+> ⚠️ **NOTE:**
+> In my experience using the video understanding capabilities of **Gemini 2.x** models, the transcription and overall video/audio understanding capacity of the model starts to go off the rails after about **15 minutes**.
+> **My recommendation:** Set the chunk size to **15 minutes** and sampling to **1 FPS**.
+> This is also the default behavior if you don't change anything.
+> This is based on my own experience and usage. I haven't done any extensive benchmarking, so your results may vary. Feel free to try different chunk sizes and settings to see what works best for you!
+---
 
-A 2.5-hour tech podcast with multiple topics, sponsors, and merch messages. [View Generated Timestamps →](examples/TS1qrTc07v4.txt)
+### Example 1: WAN Show November 21, 2025 - [Watch Video](https://www.youtube.com/watch?v=Vzgimftolys)
+
+A 5.5-hour extended episode with 55+ topics, deep technical discussions, and extensive merch message segments. [View Generated Timestamps →](examples/Vzgimftolys.txt)
+
+**Sample output:**
+```
+[0:00] Chapters.
+[0:19] Topic #1: Linus's iPhone Purchase for AirDrop becomes Obsolete with Pixel Announcement.
+   > 0:51 AirPods Features on Android.
+[1:03] Topic #2: Drama in the Pebble Community.
+[1:39] Topic #3: Microsoft Kills Windows Activation Workaround; Linux Gains Traction.
+```
+
+> **Note**: This example was generated using settings: 15-minute chunks, low resolution, 1 FPS on the free tier.
+
+### Example 2: WAN Show September 26, 2025 - [Watch Video](https://www.youtube.com/watch?v=TS1qrTc07v4)
+
+A 2.5-hour episode with multiple topics, sponsors, and merch messages. [View Generated Timestamps →](examples/TS1qrTc07v4.txt)
 
 **Sample output:**
 ```
@@ -48,17 +71,20 @@ A 2.5-hour tech podcast with multiple topics, sponsors, and merch messages. [Vie
 
 > **Note**: This example was generated using settings: 25-minute chunks, low resolution, 0.5 FPS on the free tier.
 
-### Example 2: WAN Show November 21, 2025 - [Watch Video](https://www.youtube.com/watch?v=Vzgimftolys)
+### Example 3: WAN Show March 7, 2025 - [Watch Video](https://www.youtube.com/watch?v=dD6LgAWvn64)
 
-A 5.5-hour extended episode with 55+ topics, deep technical discussions, and extensive merch message segments. [View Generated Timestamps →](examples/Vzgimftolys.txt)
+A 2-hour episode with multiple topics, sponsors, and merch messages. [View Generated Timestamps →](examples/dD6LgAWvn64.txt)
 
 **Sample output:**
 ```
+Timestamps
 [0:00] Chapters.
-[0:19] Topic #1: Linus's iPhone Purchase for AirDrop becomes Obsolete with Pixel Announcement.
-   > 0:51 AirPods Features on Android.
-[1:03] Topic #2: Drama in the Pebble Community.
-[1:39] Topic #3: Microsoft Kills Windows Activation Workaround; Linux Gains Traction.
+[0:59] Intro.
+[1:19] Sponsors.
+   > 1:19 Sponsor Shout-Outs (Animated).
+   > 1:27 dbrand, Dell & Secretlab.
+[1:45] Topic #1: NVIDIA RTX 5070 launch issues & performance.
+[5:47] Topic #2: AMD Radeon 9070 & 9070 XT launch details & performance.
 ```
 
 > **Note**: This example was generated using settings: 15-minute chunks, low resolution, 1 FPS on the free tier.

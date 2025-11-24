@@ -19,6 +19,7 @@ export interface AIMDQueueOptions {
   rpm: number;
   onConcurrencyChange?: (from: number, to: number, reason: string) => void;
   onRateLimit?: (retryAfterMs: number) => void;
+  onRetry?: (attempt: number, maxRetries: number, error: Error, metadata: unknown) => void;
 }
 
 export class AIMDQueue {
@@ -29,6 +30,7 @@ export class AIMDQueue {
   private readonly rpm: number;
   private readonly onConcurrencyChange?: (from: number, to: number, reason: string) => void;
   private readonly onRateLimit?: (retryAfterMs: number) => void;
+  private readonly onRetry?: (attempt: number, maxRetries: number, error: Error, metadata: unknown) => void;
   
   // Retry tracking
   private retryCount = 0;
@@ -40,6 +42,7 @@ export class AIMDQueue {
     this.rpm = options.rpm;
     this.onConcurrencyChange = options.onConcurrencyChange;
     this.onRateLimit = options.onRateLimit;
+    this.onRetry = options.onRetry;
     
     this.currentConcurrency = AIMD_CONFIG.initialConcurrency;
     
@@ -55,7 +58,8 @@ export class AIMDQueue {
    */
   add<T>(
     task: () => Promise<T>,
-    retries: number = AIMD_CONFIG.maxRetries
+    retries: number = AIMD_CONFIG.maxRetries,
+    metadata?: unknown
   ): Promise<T> {
     return this.queue.add(async () => {
       for (let attempt = 0; attempt <= retries; attempt++) {
@@ -100,6 +104,8 @@ export class AIMDQueue {
             // Retry
             if (attempt < retries) {
               this.retryCount++;
+              // Notify about retry attempt
+              this.onRetry?.(attempt + 1, retries, error instanceof Error ? error : new Error(String(error)), metadata);
               continue;
             }
           }

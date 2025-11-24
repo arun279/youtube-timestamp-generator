@@ -151,7 +151,7 @@ export function updateChunkStatus(
   }
 
   const level = status === 'error' ? 'error' : 'info';
-  addLog(jobId, level, `Chunk ${chunkId}: ${status}`, {
+  addLog(jobId, level, `Chunk ${chunkId + 1}: ${status}`, {
     chunkId,
     status,
     retryCount: chunk.retryCount,

@@ -65,6 +65,17 @@ export function extractYouTubeId(url: string): string | null {
 }
 
 /**
+ * Normalize YouTube URL to canonical form
+ * Strips query parameters and returns: https://www.youtube.com/watch?v=VIDEO_ID
+ */
+export function normalizeYouTubeUrl(url: string): string | null {
+  const videoId = extractYouTubeId(url);
+  if (!videoId) return null;
+  
+  return `https://www.youtube.com/watch?v=${videoId}`;
+}
+
+/**
  * Format seconds to HH:MM:SS
  */
 export function formatTimestamp(seconds: number): string {

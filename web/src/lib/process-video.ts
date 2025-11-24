@@ -38,6 +38,13 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
       onRateLimit: (retryAfterMs) => {
         console.log(`[${jobId}] Rate limited. Retrying in ${retryAfterMs}ms`);
       },
+      onRetry: (attempt, maxRetries, error, metadata) => {
+        if (metadata && typeof metadata === 'object' && 'chunkId' in metadata) {
+          const chunkId = (metadata as { chunkId: number }).chunkId;
+          updateChunkStatus(jobId, chunkId, 'retrying');
+          console.log(`[${jobId}] Chunk ${chunkId + 1} retry attempt ${attempt}/${maxRetries}: ${error.message}`);
+        }
+      },
     });
 
     // Process all chunks
@@ -63,7 +70,7 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
           // Validate that the result has actual events
           // Empty results indicate API failure or invalid chunk data
           if (!result.events || result.events.length === 0) {
-            const errorMessage = `Chunk ${chunk.id} returned empty result (no events found). This usually indicates an API issue or invalid video segment.`;
+            const errorMessage = `Chunk ${chunk.id + 1} returned empty result (no events found). This usually indicates an API issue or invalid video segment.`;
             console.error(`[${jobId}]`, errorMessage);
             throw new Error(errorMessage);
           }
@@ -79,16 +86,16 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
           );
           addTokensUsed(jobId, totalTokens);
 
-          console.log(`[${jobId}] Chunk ${chunk.id} completed in ${processingTime}ms with ${result.events.length} events`);
+          console.log(`[${jobId}] Chunk ${chunk.id + 1} completed in ${processingTime}ms with ${result.events.length} events`);
 
           return result;
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          console.error(`[${jobId}] Chunk ${chunk.id} failed:`, errorMessage);
+          console.error(`[${jobId}] Chunk ${chunk.id + 1} failed:`, errorMessage);
           updateChunkStatus(jobId, chunk.id, 'error', undefined, errorMessage);
           throw error;
         }
-      })
+      }, undefined, { chunkId: chunk.id })
     );
 
     // Wait for all chunks to complete

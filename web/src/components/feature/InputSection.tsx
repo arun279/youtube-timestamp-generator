@@ -14,7 +14,7 @@ import { AlertCircle, Loader2, Play, Settings2, Youtube } from 'lucide-react';
 import { useYouTubeDuration } from '@/hooks/use-youtube-duration';
 import { createProcessingJob } from '@/app/actions/create-job';
 import { ApiKeyStorage } from '@/lib/storage';
-import { formatDuration } from '@/lib/utils';
+import { formatDuration, normalizeYouTubeUrl } from '@/lib/utils';
 import type { ApiKeyValidationResult, ProcessingConfig } from '@/types';
 import { TokenCalculator } from './TokenCalculator';
 import { AdvancedSettings } from './AdvancedSettings';
@@ -54,8 +54,14 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
         throw new Error('API key not found. Please re-enter your key.');
       }
 
+      // Normalize URL to canonical form (strips query params like &t=)
+      const normalizedUrl = normalizeYouTubeUrl(url);
+      if (!normalizedUrl) {
+        throw new Error('Invalid YouTube URL');
+      }
+
       const fullConfig: ProcessingConfig = {
-        videoUrl: url,
+        videoUrl: normalizedUrl,
         chunkSize: config.chunkSize || 25,
         fps: config.fps || 0.5,
         resolution: config.resolution || 'low',
