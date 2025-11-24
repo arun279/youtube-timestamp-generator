@@ -139,15 +139,34 @@ export async function consolidateChunks(
   model: string = 'gemini-2.5-flash'
 ): Promise<string> {
   const genAI = createGeminiClient(apiKey);
-  const generativeModel = genAI.getGenerativeModel({ model });
+  const generativeModel = genAI.getGenerativeModel({
+    model,
+    generationConfig: {
+      maxOutputTokens: 65536, // Increase from default 8192 to support long videos
+    }
+  });
 
   // Prepare input for consolidation
   const chunksJson = JSON.stringify(chunkAnalyses, null, 2);
   
   const fullPrompt = `${prompt}\n\n<chunk_data>\n${chunksJson}\n</chunk_data>`;
 
+  console.log(`[consolidateChunks] Processing ${chunkAnalyses.length} chunks, input size: ${fullPrompt.length} chars`);
+
   const result = await generativeModel.generateContent(fullPrompt);
-  return result.response.text();
+  const responseText = result.response.text();
+  
+  // Log finish reason and token usage for debugging
+  const candidate = result.response.candidates?.[0];
+  console.log(`[consolidateChunks] Finish reason: ${candidate?.finishReason || 'unknown'}`);
+  console.log(`[consolidateChunks] Output length: ${responseText.length} chars`);
+  
+  // Warn if output seems suspiciously short (< 1000 chars for multi-chunk videos)
+  if (chunkAnalyses.length > 5 && responseText.length < 1000) {
+    console.warn(`[consolidateChunks] WARNING: Output suspiciously short (${responseText.length} chars for ${chunkAnalyses.length} chunks)`);
+  }
+  
+  return responseText;
 }
 
 /**
