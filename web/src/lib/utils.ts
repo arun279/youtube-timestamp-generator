@@ -1,5 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { TOKEN_CONSTANTS } from './constants';
+import type { MediaResolutionType } from '@/types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,26 +20,45 @@ export async function hashString(str: string): Promise<string> {
 
 /**
  * Calculate tokens for video processing
- * Based on Gemini API token calculations
+ * Based on official Gemini API documentation:
+ * https://ai.google.dev/gemini-api/docs/media-resolution
+ *
+ * Formula: tokensPerSecond = (fps × tokensPerFrame) + audioTokensPerSecond
+ *
+ * For Gemini 2.5:
+ * - LOW: 64 tokens/frame
+ * - MEDIUM: 256 tokens/frame
+ * - HIGH: 256 tokens/frame
+ * - Audio: 32 tokens/second (always)
  */
 export function calculateTokens(
   durationSeconds: number,
   fps: number,
-  resolution: 'low' | 'default'
+  resolution: MediaResolutionType
 ): {
   tokensPerSecond: number;
   totalTokens: number;
+  breakdown: {
+    videoTokensPerSecond: number;
+    audioTokensPerSecond: number;
+    tokensPerFrame: number;
+  };
 } {
-  // Token rates from Gemini docs
-  const baseTokensPerSecond = resolution === 'low' ? 98 : 263;
-
-  // FPS adjustment (proportional)
-  const fpsMultiplier = fps / 1.0; // 1.0 FPS is the baseline
-
-  const tokensPerSecond = baseTokensPerSecond * fpsMultiplier;
+  const tokensPerFrame = TOKEN_CONSTANTS.tokensPerFrame[resolution];
+  const audioTokensPerSecond = TOKEN_CONSTANTS.audioTokensPerSecond;
+  const videoTokensPerSecond = fps * tokensPerFrame;
+  const tokensPerSecond = videoTokensPerSecond + audioTokensPerSecond;
   const totalTokens = Math.ceil(tokensPerSecond * durationSeconds);
 
-  return { tokensPerSecond, totalTokens };
+  return {
+    tokensPerSecond,
+    totalTokens,
+    breakdown: {
+      videoTokensPerSecond,
+      audioTokensPerSecond,
+      tokensPerFrame,
+    },
+  };
 }
 
 /**
@@ -128,7 +149,7 @@ export function generateChunks(
   durationSeconds: number,
   chunkSizeMinutes: number,
   fps: number,
-  resolution: 'low' | 'default'
+  resolution: MediaResolutionType
 ): Array<{
   id: number;
   startOffset: string;

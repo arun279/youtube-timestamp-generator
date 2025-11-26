@@ -7,6 +7,7 @@
 
 import { createJob, initializeJobCleanup } from '@/lib/jobs';
 import { generateChunks } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import { ProcessingConfigSchema } from '@/types';
 import type { JobCreationResult } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -41,25 +42,27 @@ export async function createProcessingJob(
     createJob(jobId, validatedConfig, chunks);
 
     // Log for debugging
-    console.warn(`[createProcessingJob] Created job ${jobId} with ${chunks.length} chunks`);
+    logger.info('CreateJob', 'Job created', { jobId, chunkCount: chunks.length });
 
     // Import and call the background processing function directly
     // This avoids the fetch() issue in standalone builds
     import('@/lib/process-video')
       .then(async (module) => {
         try {
-          console.warn(`[createProcessingJob] Starting background processing for job ${jobId}`);
+          logger.info('CreateJob', 'Starting background processing', { jobId });
           // Call the background processing directly
           await module.processVideoInBackground(jobId, apiKey);
         } catch (error) {
-          console.error(
-            `[createProcessingJob] Background processing error for job ${jobId}:`,
-            error
-          );
+          logger.error('CreateJob', 'Background processing error', {
+            jobId,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
         }
       })
       .catch((error) => {
-        console.error(`[createProcessingJob] Failed to import process-video module:`, error);
+        logger.error('CreateJob', 'Failed to import process-video module', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
       });
 
     return {

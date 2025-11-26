@@ -4,15 +4,30 @@ import { z } from 'zod';
 // Configuration Types
 // ============================================================================
 
-export const MediaResolution = z.enum(['low', 'default']);
-export type MediaResolution = z.infer<typeof MediaResolution>;
+/**
+ * Media resolution options for video processing
+ * Based on Gemini API MediaResolution enum
+ *
+ * Token counts per frame (Gemini 2.5):
+ * - low: 64 tokens/frame
+ * - medium: 256 tokens/frame
+ * - high: 256 tokens/frame (same as medium for Gemini 2.5)
+ *
+ * Plus audio: 32 tokens/second always
+ */
+export const MediaResolutionSchema = z.enum(['low', 'medium', 'high']);
+export type MediaResolutionType = z.infer<typeof MediaResolutionSchema>;
+
+export const Tier = z.enum(['free', 'tier1', 'tier2', 'tier3']);
+export type Tier = z.infer<typeof Tier>;
 
 export const ProcessingConfigSchema = z.object({
   videoUrl: z.string().url(),
-  chunkSize: z.number().min(5).max(60).default(25), // minutes
+  chunkSize: z.number().min(5).max(60).default(15), // minutes (reduced default for safety)
   fps: z.number().min(0.2).max(2.0).default(0.5),
-  resolution: MediaResolution.default('low'),
-  model: z.string().default('gemini-2.0-flash-exp'),
+  resolution: MediaResolutionSchema.default('low'),
+  model: z.string().default('gemini-2.5-flash'),
+  tier: Tier.default('free'),
   concurrencyMode: z.enum(['adaptive', 'manual']).default('adaptive'),
   manualConcurrency: z.number().min(1).max(10).optional(),
 });
@@ -101,7 +116,7 @@ export interface Job {
 export interface ApiKeyValidationResult {
   isValid: boolean;
   models?: string[];
-  tier?: 'free' | 'paid' | 'unknown';
+  tier?: Tier;
   tpm?: number; // Tokens per minute
   rpm?: number; // Requests per minute
   error?: string;
@@ -168,7 +183,7 @@ export interface LogEvent {
 export interface StoredApiKey {
   key: string;
   hash: string;
-  tier: 'free' | 'paid' | 'unknown';
+  tier: Tier;
   models: string[];
   expiresAt?: string; // ISO 8601
 }

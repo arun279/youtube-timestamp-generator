@@ -2,44 +2,92 @@
  * Application constants
  */
 
-// Gemini API tier limits (from docs/gemini/)
-export const TIER_LIMITS = {
-  free: {
-    tpm: 250_000, // Tokens per minute
-    rpm: 15, // Requests per minute
-    rpd: 1500, // Requests per day
-  },
-  paid: {
-    tpm: 4_000_000,
-    rpm: 360,
-    rpd: -1, // unlimited
-  },
-} as const;
-
 // Default models
 export const DEFAULT_MODELS = {
-  flash: 'gemini-2.0-flash-exp',
-  pro: 'gemini-2.0-pro-exp',
+  flash: 'gemini-2.5-flash',
+  pro: 'gemini-2.5-pro',
 } as const;
 
-// AIMD Queue constants
-export const AIMD_CONFIG = {
-  initialConcurrency: 1,
-  incrementStep: 1,
-  decrementMultiplier: 0.5,
-  minConcurrency: 1,
-  maxConcurrency: 10,
-  retryDelayMs: 1000,
-  maxRetries: 3,
-  exponentialBackoffBase: 2,
-  jitterMs: 500,
+// Processing Queue Configuration
+export const QUEUE_CONFIG = {
+  maxConcurrent: 10, // Safety cap - sliding window is primary control
+  maxRetries: 5,
+  backoffBase: 2,
+  backoffMax: 60_000, // 60 seconds
 } as const;
 
-// Token calculation constants
-export const TOKEN_RATES = {
-  low: 98, // tokens/second at low resolution
-  default: 263, // tokens/second at default resolution
+/**
+ * Rate limiting configuration
+ * These values are shared between UI (TokenCalculator) and backend (AdaptiveRateLimiter)
+ * to ensure consistent estimates and behavior
+ */
+export const RATE_LIMIT_CONFIG = {
+  /**
+   * Safety multiplier applied to token estimates
+   * Accounts for estimation inaccuracy (~12% observed underestimate)
+   * The adaptive rate limiter will adjust this based on actual usage
+   */
+  initialSafetyMultiplier: 1.2,
+
+  /**
+   * Buffer percentage applied to TPM/RPM limits
+   * Provides headroom for Google's tracking differences
+   */
+  limitBufferPercent: 0.1,
 } as const;
+
+/**
+ * Token calculation constants from official Gemini API documentation
+ * Source: https://ai.google.dev/gemini-api/docs/media-resolution
+ *
+ * For Gemini 2.5 models:
+ * - LOW: 64 tokens per frame
+ * - MEDIUM: 256 tokens per frame
+ * - HIGH: 256 tokens per frame (same as medium)
+ * - Audio: 32 tokens per second (always included)
+ *
+ * Formula: tokensPerSecond = (fps × tokensPerFrame) + audioTokensPerSecond
+ */
+export const TOKEN_CONSTANTS = {
+  // Tokens per frame by resolution (Gemini 2.5)
+  tokensPerFrame: {
+    low: 64,
+    medium: 256,
+    high: 256,
+  },
+  // Audio is always 32 tokens/second regardless of resolution
+  audioTokensPerSecond: 32,
+} as const;
+
+/**
+ * Calculate tokens per second based on resolution and FPS
+ * @param resolution - Media resolution setting
+ * @param fps - Frames per second
+ * @returns Tokens per second
+ */
+export function calculateTokensPerSecond(
+  resolution: 'low' | 'medium' | 'high',
+  fps: number
+): number {
+  const tokensPerFrame = TOKEN_CONSTANTS.tokensPerFrame[resolution];
+  return fps * tokensPerFrame + TOKEN_CONSTANTS.audioTokensPerSecond;
+}
+
+/**
+ * Calculate total tokens for a video segment
+ * @param durationSeconds - Duration in seconds
+ * @param resolution - Media resolution setting
+ * @param fps - Frames per second
+ * @returns Total tokens estimate
+ */
+export function calculateTotalTokens(
+  durationSeconds: number,
+  resolution: 'low' | 'medium' | 'high',
+  fps: number
+): number {
+  const tokensPerSecond = calculateTokensPerSecond(resolution, fps);
+  return Math.ceil(tokensPerSecond * durationSeconds);
+}
 
 // Storage keys
 export const STORAGE_KEYS = {

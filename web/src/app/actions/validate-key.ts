@@ -64,7 +64,7 @@ export async function validateApiKey(apiKey: string): Promise<ApiKeyValidationRe
           models: [],
           tier: 'free',
           tpm: 250_000,
-          rpm: 15,
+          rpm: 10,
           error: 'API key is valid but rate limited. You may be on the free tier.',
         };
       }
