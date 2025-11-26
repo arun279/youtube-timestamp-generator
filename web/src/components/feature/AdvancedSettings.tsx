@@ -28,12 +28,10 @@ export function AdvancedSettings({
   };
 
   return (
-    <div className="space-y-4 p-4 border rounded-md bg-muted/30">
+    <div className="space-y-4 rounded-md border bg-muted/30 p-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">Advanced Settings</h3>
-        <span className="text-xs text-muted-foreground">
-          Tier: {apiKeyInfo.tier || 'unknown'}
-        </span>
+        <span className="text-xs text-muted-foreground">Tier: {apiKeyInfo.tier || 'unknown'}</span>
       </div>
 
       <Separator />
@@ -44,29 +42,25 @@ export function AdvancedSettings({
         <div className="flex gap-2">
           <button
             onClick={() => updateConfig({ resolution: 'low' })}
-            className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${
+            className={`flex-1 rounded-md border px-3 py-2 text-xs transition-colors ${
               config.resolution === 'low'
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-input hover:bg-accent'
             }`}
           >
             Low (Fast)
-            <span className="block text-xs opacity-70 mt-0.5">
-              98 tokens/s
-            </span>
+            <span className="mt-0.5 block text-xs opacity-70">98 tokens/s</span>
           </button>
           <button
             onClick={() => updateConfig({ resolution: 'default' })}
-            className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${
+            className={`flex-1 rounded-md border px-3 py-2 text-xs transition-colors ${
               config.resolution === 'default'
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-input hover:bg-accent'
             }`}
           >
             Default (Quality)
-            <span className="block text-xs opacity-70 mt-0.5">
-              263 tokens/s
-            </span>
+            <span className="mt-0.5 block text-xs opacity-70">263 tokens/s</span>
           </button>
         </div>
       </div>
@@ -75,9 +69,7 @@ export function AdvancedSettings({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label className="text-xs font-medium">Frames Per Second</Label>
-          <span className="text-xs text-muted-foreground">
-            {config.fps || 0.5} FPS
-          </span>
+          <span className="text-xs text-muted-foreground">{config.fps || 0.5} FPS</span>
         </div>
         <Slider
           value={[config.fps || 0.5]}
@@ -87,18 +79,14 @@ export function AdvancedSettings({
           step={0.1}
           className="py-4"
         />
-        <p className="text-xs text-muted-foreground">
-          Lower FPS = faster processing, less detail
-        </p>
+        <p className="text-xs text-muted-foreground">Lower FPS = faster processing, less detail</p>
       </div>
 
       {/* Chunk Size Slider */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label className="text-xs font-medium">Chunk Size</Label>
-          <span className="text-xs text-muted-foreground">
-            {config.chunkSize || 25} minutes
-          </span>
+          <span className="text-xs text-muted-foreground">{config.chunkSize || 25} minutes</span>
         </div>
         <Slider
           value={[config.chunkSize || 25]}
@@ -119,33 +107,28 @@ export function AdvancedSettings({
         <div className="flex gap-2">
           <button
             onClick={() => updateConfig({ concurrencyMode: 'adaptive' })}
-            className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${
+            className={`flex-1 rounded-md border px-3 py-2 text-xs transition-colors ${
               config.concurrencyMode === 'adaptive'
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-input hover:bg-accent'
             }`}
           >
             🤖 Adaptive
-            <span className="block text-xs opacity-70 mt-0.5">
-              Recommended
-            </span>
+            <span className="mt-0.5 block text-xs opacity-70">Recommended</span>
           </button>
           <button
             onClick={() => updateConfig({ concurrencyMode: 'manual' })}
-            className={`flex-1 px-3 py-2 text-xs rounded-md border transition-colors ${
+            className={`flex-1 rounded-md border px-3 py-2 text-xs transition-colors ${
               config.concurrencyMode === 'manual'
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-input hover:bg-accent'
             }`}
           >
             🎛️ Manual
-            <span className="block text-xs opacity-70 mt-0.5">
-              Fixed rate
-            </span>
+            <span className="mt-0.5 block text-xs opacity-70">Fixed rate</span>
           </button>
         </div>
       </div>
     </div>
   );
 }
-

@@ -14,7 +14,7 @@ import { AlertCircle, Loader2, Play, Settings2, Youtube } from 'lucide-react';
 import { useYouTubeDuration } from '@/hooks/use-youtube-duration';
 import { createProcessingJob } from '@/app/actions/create-job';
 import { ApiKeyStorage } from '@/lib/storage';
-import { formatDuration } from '@/lib/utils';
+import { formatDuration, normalizeYouTubeUrl } from '@/lib/utils';
 import type { ApiKeyValidationResult, ProcessingConfig } from '@/types';
 import { TokenCalculator } from './TokenCalculator';
 import { AdvancedSettings } from './AdvancedSettings';
@@ -40,7 +40,12 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
   });
 
   // Get video duration
-  const { duration, title, loading: durationLoading, error: durationError } = useYouTubeDuration(url);
+  const {
+    duration,
+    title,
+    loading: durationLoading,
+    error: durationError,
+  } = useYouTubeDuration(url);
 
   const handleStart = async () => {
     if (!url || !duration) return;
@@ -54,8 +59,14 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
         throw new Error('API key not found. Please re-enter your key.');
       }
 
+      // Normalize URL to canonical form (strips query params like &t=)
+      const normalizedUrl = normalizeYouTubeUrl(url);
+      if (!normalizedUrl) {
+        throw new Error('Invalid YouTube URL');
+      }
+
       const fullConfig: ProcessingConfig = {
-        videoUrl: url,
+        videoUrl: normalizedUrl,
         chunkSize: config.chunkSize || 25,
         fps: config.fps || 0.5,
         resolution: config.resolution || 'low',
@@ -78,9 +89,7 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
     <Card>
       <CardHeader>
         <CardTitle>Video Input</CardTitle>
-        <CardDescription>
-          Paste a YouTube URL to get started
-        </CardDescription>
+        <CardDescription>Paste a YouTube URL to get started</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* URL Input */}
@@ -88,7 +97,7 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
           <Label htmlFor="url">YouTube URL</Label>
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Youtube className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+              <Youtube className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="url"
                 type="url"
@@ -105,7 +114,7 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
               onClick={() => setShowAdvanced(!showAdvanced)}
               disabled={isStarting}
             >
-              <Settings2 className="w-4 h-4" />
+              <Settings2 className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -113,23 +122,21 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
         {/* Video Info */}
         {durationLoading && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
             Loading video information...
           </div>
         )}
 
         {duration && title && (
-          <div className="p-3 bg-muted rounded-md space-y-1">
+          <div className="space-y-1 rounded-md bg-muted p-3">
             <p className="text-sm font-medium">{title}</p>
-            <p className="text-xs text-muted-foreground">
-              Duration: {formatDuration(duration)}
-            </p>
+            <p className="text-xs text-muted-foreground">Duration: {formatDuration(duration)}</p>
           </div>
         )}
 
         {durationError && (
-          <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-            <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-3">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
             <p className="text-sm text-destructive">{durationError}</p>
           </div>
         )}
@@ -157,27 +164,22 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
 
         {/* Error Message */}
         {error && (
-          <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-            <AlertCircle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/10 p-3">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
             <p className="text-sm text-destructive">{error}</p>
           </div>
         )}
 
         {/* Start Button */}
-        <Button
-          onClick={handleStart}
-          disabled={!canStart}
-          className="w-full"
-          size="lg"
-        >
+        <Button onClick={handleStart} disabled={!canStart} className="w-full" size="lg">
           {isStarting ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin" />
               Starting...
             </>
           ) : (
             <>
-              <Play className="w-5 h-5" />
+              <Play className="h-5 w-5" />
               Generate Timestamps
             </>
           )}
@@ -186,4 +188,3 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
     </Card>
   );
 }
-

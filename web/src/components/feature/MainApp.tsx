@@ -66,43 +66,27 @@ export function MainApp() {
   if (state === 'ready') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-        <div className="max-w-4xl mx-auto space-y-6 py-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-4xl font-bold tracking-tight">
-              YouTube Timestamp Generator
-            </h1>
+        <div className="mx-auto max-w-4xl space-y-6 py-8">
+          <div className="space-y-2 text-center">
+            <h1 className="text-4xl font-bold tracking-tight">YouTube Timestamp Generator</h1>
             <p className="text-muted-foreground">
               AI-powered timestamp generation using Gemini 2.5 Flash
             </p>
           </div>
-          
-          <InputSection
-            apiKeyInfo={apiKeyInfo!}
-            onStart={handleProcessingStarted}
-          />
+
+          <InputSection apiKeyInfo={apiKeyInfo!} onStart={handleProcessingStarted} />
         </div>
       </div>
     );
   }
 
   if (state === 'processing' && jobId) {
-    return (
-      <ProcessingView
-        jobId={jobId}
-        onComplete={handleProcessingComplete}
-      />
-    );
+    return <ProcessingView jobId={jobId} onComplete={handleProcessingComplete} />;
   }
 
   if (state === 'completed' && jobId) {
-    return (
-      <ResultsView
-        jobId={jobId}
-        onStartNew={handleStartNew}
-      />
-    );
+    return <ResultsView jobId={jobId} onStartNew={handleStartNew} />;
   }
 
   return null;
 }
-

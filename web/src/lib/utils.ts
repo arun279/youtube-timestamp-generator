@@ -1,5 +1,5 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,7 +13,7 @@ export async function hashString(str: string): Promise<string> {
   const data = encoder.encode(str);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 /**
@@ -30,10 +30,10 @@ export function calculateTokens(
 } {
   // Token rates from Gemini docs
   const baseTokensPerSecond = resolution === 'low' ? 98 : 263;
-  
+
   // FPS adjustment (proportional)
   const fpsMultiplier = fps / 1.0; // 1.0 FPS is the baseline
-  
+
   const tokensPerSecond = baseTokensPerSecond * fpsMultiplier;
   const totalTokens = Math.ceil(tokensPerSecond * durationSeconds);
 
@@ -62,6 +62,17 @@ export function extractYouTubeId(url: string): string | null {
   }
 
   return null;
+}
+
+/**
+ * Normalize YouTube URL to canonical form
+ * Strips query parameters and returns: https://www.youtube.com/watch?v=VIDEO_ID
+ */
+export function normalizeYouTubeUrl(url: string): string | null {
+  const videoId = extractYouTubeId(url);
+  if (!videoId) return null;
+
+  return `https://www.youtube.com/watch?v=${videoId}`;
 }
 
 /**
@@ -154,10 +165,10 @@ export function calculateETA(
   elapsedMs: number
 ): number | null {
   if (completedChunks === 0) return null;
-  
+
   const avgTimePerChunk = elapsedMs / completedChunks;
   const remainingChunks = totalChunks - completedChunks;
-  
+
   return Math.ceil((avgTimePerChunk * remainingChunks) / 1000); // seconds
 }
 
@@ -181,10 +192,9 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null;
-  
+
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
 }
-

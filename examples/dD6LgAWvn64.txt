@@ -1,0 +1,98 @@
+Timestamps
+[0:00] Chapters.
+[0:59] Intro.
+[1:19] Sponsors.
+   > 1:19 Sponsor Shout-Outs (Animated).
+   > 1:27 dbrand, Dell & Secretlab.
+[1:45] Topic #1: NVIDIA RTX 5070 launch issues & performance.
+[5:47] Topic #2: AMD Radeon 9070 & 9070 XT launch details & performance.
+   > 7:46 GPU pricing strategies & rebates: MSRP is limited quantity, prices jump after initial stock.
+   > 8:44 Types of rebates: mail-in VS point-of-sale, common but disingenuous practices.
+   > 9:31 GPU pricing & retailer leverage: GTX 480 example & NVIDIA's price protection tactics.
+   > 13:51 Deceptive promotional pricing: 'instant-rebated' intro prices that later jump up.
+[15:00] [Cont.] Topic #2: GPU market fervor & retailer impact.
+   > 15:21 Current market compared to NVIDIA 8800 GT launch (pre-AI & crypto boom).
+   > 15:56 8800 GT specs & value: G92 die, power-efficient, near 8800 GTX performance at half price.
+   > 16:56 8800 GT pricing evolution & retailer control: less aggressive price hikes & more retailer control back then.
+   > 18:44 AMD's stated pricing & market expectations: $549/$599 MSRPs are not launch-only (excluding tariffs/taxes).
+   > 19:28 Evolution of GPU price bands & premium SKUs: stretched-out price bands make it hard to drive prices down.
+   > 22:04 Last-minute pricing & communication errors: AMD's undetermined pricing led to LTT video errors & Best Buy incorrect listings.
+   > 22:40 Strategic VS incompetent pricing & retailer margins: AIBs have thin margins, AMD's 'disingenuous' MSRP control.
+   > 25:25 The GPU allocation 'lever' & price control: GPU makers threaten to withhold allocation for pricing adherence.
+   > 29:16 Tariffs, AMD's knowledge & lack of transparency: 20% tariff on China-made cards ignored in MSRP.
+[30:00] [Cont.] Topic #2: AMD's GPU pricing strategy & tariffs.
+   > 30:58 Retailer transparency on tariffs: Luke asks about displaying tariff increases.
+   > 31:19 Tariff handling for consumers VS retailers: bulk tariffs bundled into cost, not displayed separately.
+[33:14] Topic #3: AMD's intentions & past GPU launch history.
+   > 35:06 Linus takes off beanie & headphones.
+   > 35:22 Summary of GPU discussion questions: supply shortage, board partners' feelings & scarcity marketing.
+[45:00] Merch Messages #1.
+   > 45:00 Discussion of 'Terminally Online' T-Shirt pricing (LTTStore) ft. Nick.
+   > 45:39 Profitability goals & T-shirt pricing: becoming untenable under CEO Teren Tong.
+   > 46:02 Defense of 'Terminally Online' Hoodie pricing: all-over embroidered, fairly priced at $89.99 USD.
+   > 46:45 T-shirt price comparison to other creators: LTTStore's $20 tees are competitive.
+   > 46:58 'Terminally Online' Hoodie product page & price ($59.99 USD) with Gen Z models.
+   > 47:20 Recommendation for best starter hot-swappable mechanical keyboard ft. Andrew M.
+   > 47:43 LTTStore pricing philosophy & inventory: cost markup, not 'ridiculous margins', $3M inventory coming.
+   > 48:40 Luke jokes about buying all the tall blanks.
+[49:04] Why is WAN Late? Floatplane Exclusive series.
+   > 49:57 New Floatplane exclusive: 'LMG Members Share Their First Meeting with Linus'.
+[50:14] Merch Messages #2.
+   > 50:14 Luke's go-to breakfast.
+   > 50:42 David K suggests 'Chicken & rice for every meal'.
+   > 51:11 Why are products like Tech Bro & Workshop Jacket removed from LTTStore? Old product archive coming.
+   > 51:46 Accidental GPU purchase: N9070 VS N9070xt on Newegg, cut losses or return?
+   > 52:04 GPU purchase philosophy & scalping: Linus refuses to buy scalped GPUs, discusses ethical dilemma.
+   > 53:11 LTT Screwdriver 'responsible for extending my IT career at Xbox'. What LTT product surprised Linus most?
+   > 53:50 Personal tech choices & consumerism: M2 MacBook & iPhone 16 Plus choices.
+   > 56:29 News on good USB cables: 'Soon very soon'.
+   > 57:12 LTT's approach to product reviews: contextual performance & price, not just FPS.
+[58:42] Sponsors.
+   > 58:42 Squarespace: LMG's website, ease of use, AI tools, 10% off with code WAN.
+   > 59:38 Vessi: CGI animation of Linus running in rain with GPU.
+   > 59:53 Vessi product features: waterproof, breathable, lightweight shoes.
+   > 1:00:00 Vessi shoes: comfy, stretchy, for long walks, Stormbursts for hiking, 15% off with vessi.com/wanshow.
+   > 1:00:54 Corsair Frame 4000D: modular PC case, InfiniRail, supports chunky GPUs & reverse connection.
+[1:01:50] Topic #4: Mozilla responds to Firefox terms of use backlash.
+   > 1:03:27 Diligence in reading terms & licenses: Luke reads for company, Linus for specific contracts.
+   > 1:04:55 Discord ownership & data concerns: Tencent's stake & implications for data handling.
+[1:15:00] Momentum VS Inertia discussion ft. elephant example.
+[1:15:55] Topic #5: YouTube Premium Lite announced.
+   > 1:17:08 Critique of YouTube Premium Lite's value: unappealing given limitations & small price difference.
+[1:18:08] Correction: Placebo effect & cancer survival rates.
+   > 1:19:13 Further clarification on placebo & scams: LTT unequivocally does not endorse companies pushing scams.
+[1:20:41] Topic #6: Microsoft testing free desktop Office apps with ads.
+   > 1:22:15 Critique of free Microsoft Office offer: extensive limitations, better off with Google Docs or LibreOffice.
+[1:22:48] Topic #7: Lenovo ThinkBook Flip AI prototype from MWC.
+   > 1:24:57 Rating Lenovo ThinkBook Flip AI prototype: Luke 6, Linus 4 (practicality & travel concerns).
+   > 1:26:24 Lenovo Magic Bay Dual Display concept: proprietary connections for two 13-inch or one 8-inch vertical screen.
+   > 1:27:27 Lenovo Yoga Solar PC concept: laptop with solar panel in lid, 20 mins sunlight for 1 hour video playback.
+   > 1:29:04 Rating Lenovo Yoga Solar PC concept: Luke 2, Linus 3 (impractical & heavy).
+[1:30:00] Topic #8: Lenovo USB-C AI Stick with 32 TOPS NPU.
+   > 1:30:31 Critique of Lenovo AI Stick: Linus 'zero' (anemic 32 TOPS), Luke finds pitch uncompelling.
+[1:31:13] Topic #9: Infinix Zero Series Mini Tri-Fold concept phone.
+   > 1:31:38 Dislike for the Tri-Fold phone: Linus 'zero' (super annoying multi-step unfolding).
+[1:32:42] Topic #10: Infinix Solar Energy Reserving Technology phone.
+[1:33:39] Topic #11: Xiaomi Buds 5 Pro with Wi-Fi music streaming.
+   > 1:34:12 Thoughts on Wi-Fi earbuds & Mac Wi-Fi sharing limitations (Linus uses Windows for flights).
+[1:35:33] Topic #12: Samsung Flex Gaming Concept (foldable Steam Deck).
+   > 1:36:26 Critique of Flex Gaming Concept: usability flaws (thumbsticks fit into slanted holes), Linus 'negative zero'.
+   > 1:37:21 Folding handhelds for travel: Linus appreciates for portability, jokes about 'rage quitting'.
+[1:37:56] Topic #13: Samsung Asymmetric Flip smartphone concept.
+[1:38:42] Topic #14: TechRadar article: 'Built VS Bought: Why prebuilt systems are always superior'.
+   > 1:40:04 Rebuttal to prebuilt PC claims: LTT's Secret Shopper series proves QC often misses critical issues.
+   > 1:40:29 EV comparison analogy: article's car analogy questioned for claimed performance figures.
+   > 1:40:44 Why are prebuilts better? Linus says good post-purchase support (e.g., on-site business service) is primary reason.
+   > 1:41:17 PC building VS engineering: configuring a PC is not 'engineering' in the protected Canadian sense.
+   > 1:41:33 Critique of misleading naming schemes & obfuscated specs by manufacturers.
+[1:43:04] After Dark: 12GB GPU Discussion.
+   > 1:43:42 12GB cards for 4K gaming issues: significant lag spikes on 3070/3070 XT, unlike 16GB cards.
+   > 1:44:04 12GB cards not suitable for 4K AAA gaming in mid-term due to lag spikes on higher texture settings.
+[1:45:00] [Cont.] After Dark: LTT's review philosophy on GPU performance.
+[1:45:59] Merch Messages #3.
+   > 1:45:59 Favorite Tape to Tape characters & perks: 'Gawain Garetsky' comically tanky, 'headshot redirect ability' is broken.
+   > 1:47:59 Enjoying building PCs for yourself? Linus enjoys 'something different', like a Kickstarter project.
+   > 1:49:30 A place to visit in Flathead Valley, Montana ft. Luke's travel wishlist.
+   > 1:50:45 Travel wishlist: Australia for scuba diving.
+   > 1:51:51 Final Fantasy Tactics mods, FFT 1.3 & FF6 quality drop after floating continent.
+[1:57:07] Outro.

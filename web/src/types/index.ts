@@ -56,24 +56,14 @@ export type ChunkAnalysis = z.infer<typeof ChunkAnalysisSchema>;
 // Job Management Types
 // ============================================================================
 
-export type JobStatus = 
-  | 'pending'
-  | 'processing'
-  | 'consolidating'
-  | 'completed'
-  | 'failed';
+export type JobStatus = 'pending' | 'processing' | 'consolidating' | 'completed' | 'failed';
 
-export type ChunkStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'error'
-  | 'retrying';
+export type ChunkStatus = 'pending' | 'processing' | 'completed' | 'error' | 'retrying';
 
 export interface ChunkMetadata {
   id: number;
   startOffset: string; // e.g., "0s"
-  endOffset: string;   // e.g., "1500s"
+  endOffset: string; // e.g., "1500s"
   estimatedTokens: number;
   status: ChunkStatus;
   result?: ChunkAnalysis;
@@ -99,8 +89,8 @@ export interface Job {
   totalTokensUsed: number;
   retriesCount: number;
   startTime: string; // ISO 8601
-  endTime?: string;  // ISO 8601
-  result?: string;   // Final consolidated timestamp document
+  endTime?: string; // ISO 8601
+  result?: string; // Final consolidated timestamp document
   error?: string;
 }
 
@@ -127,12 +117,7 @@ export interface JobCreationResult {
 // SSE Event Types
 // ============================================================================
 
-export type SSEEventType =
-  | 'job:status'
-  | 'chunk:update'
-  | 'concurrency:change'
-  | 'log'
-  | 'error';
+export type SSEEventType = 'job:status' | 'chunk:update' | 'concurrency:change' | 'log' | 'error';
 
 export interface SSEEvent {
   type: SSEEventType;
@@ -209,4 +194,3 @@ export interface TokenCalculation {
   withinLimit: boolean;
   warningMessage?: string;
 }
-

@@ -29,11 +29,38 @@ Processing complete! Final timestamps with statistics (chunks processed, tokens 
 
 See real-world examples of generated timestamps. Click the video links to compare with the actual content:
 
-### Example 1: WAN Show September 26, 2025 - [Watch Video](https://www.youtube.com/watch?v=TS1qrTc07v4)
+---
 
-A 2.5-hour tech podcast with multiple topics, sponsors, and merch messages. [View Generated Timestamps →](examples/TS1qrTc07v4.txt)
+> ⚠️ **NOTE:**
+> In my experience using the video understanding capabilities of **Gemini 2.x** models, the transcription and overall video/audio understanding capacity of the model starts to go off the rails after about **15 minutes**.
+> **My recommendation:** Set the chunk size to **15 minutes** and sampling to **1 FPS**.
+> This is also the default behavior if you don't change anything.
+> This is based on my own experience and usage. I haven't done any extensive benchmarking, so your results may vary. Feel free to try different chunk sizes and settings to see what works best for you!
+
+---
+
+### Example 1: WAN Show November 21, 2025 - [Watch Video](https://www.youtube.com/watch?v=Vzgimftolys)
+
+A 5.5-hour extended episode with 55+ topics, deep technical discussions, and extensive merch message segments. [View Generated Timestamps →](examples/Vzgimftolys.txt)
 
 **Sample output:**
+
+```
+[0:00] Chapters.
+[0:19] Topic #1: Linus's iPhone Purchase for AirDrop becomes Obsolete with Pixel Announcement.
+   > 0:51 AirPods Features on Android.
+[1:03] Topic #2: Drama in the Pebble Community.
+[1:39] Topic #3: Microsoft Kills Windows Activation Workaround; Linux Gains Traction.
+```
+
+> **Note**: This example was generated using settings: 15-minute chunks, low resolution, 1 FPS on the free tier.
+
+### Example 2: WAN Show September 26, 2025 - [Watch Video](https://www.youtube.com/watch?v=TS1qrTc07v4)
+
+A 2.5-hour episode with multiple topics, sponsors, and merch messages. [View Generated Timestamps →](examples/TS1qrTc07v4.txt)
+
+**Sample output:**
+
 ```
 [0:00] Intro.
 [0:19] Topic #1: Introduction of Headline Topics.
@@ -48,17 +75,21 @@ A 2.5-hour tech podcast with multiple topics, sponsors, and merch messages. [Vie
 
 > **Note**: This example was generated using settings: 25-minute chunks, low resolution, 0.5 FPS on the free tier.
 
-### Example 2: WAN Show November 21, 2025 - [Watch Video](https://www.youtube.com/watch?v=Vzgimftolys)
+### Example 3: WAN Show March 7, 2025 - [Watch Video](https://www.youtube.com/watch?v=dD6LgAWvn64)
 
-A 5.5-hour extended episode with 55+ topics, deep technical discussions, and extensive merch message segments. [View Generated Timestamps →](examples/Vzgimftolys.txt)
+A 2-hour episode with multiple topics, sponsors, and merch messages. [View Generated Timestamps →](examples/dD6LgAWvn64.txt)
 
 **Sample output:**
+
 ```
+Timestamps
 [0:00] Chapters.
-[0:19] Topic #1: Linus's iPhone Purchase for AirDrop becomes Obsolete with Pixel Announcement.
-   > 0:51 AirPods Features on Android.
-[1:03] Topic #2: Drama in the Pebble Community.
-[1:39] Topic #3: Microsoft Kills Windows Activation Workaround; Linux Gains Traction.
+[0:59] Intro.
+[1:19] Sponsors.
+   > 1:19 Sponsor Shout-Outs (Animated).
+   > 1:27 dbrand, Dell & Secretlab.
+[1:45] Topic #1: NVIDIA RTX 5070 launch issues & performance.
+[5:47] Topic #2: AMD Radeon 9070 & 9070 XT launch details & performance.
 ```
 
 > **Note**: This example was generated using settings: 15-minute chunks, low resolution, 1 FPS on the free tier.
@@ -108,6 +139,7 @@ The `--build` flag rebuilds the image with your changes before starting.
 ### 1. Enter API Key (First Time)
 
 On first launch, you'll see an onboarding screen:
+
 - Paste your Gemini API key
 - Optionally check "Remember this key" to persist in localStorage
 - Keys are validated server-side before use
@@ -127,6 +159,7 @@ On first launch, you'll see an onboarding screen:
 ### 3. Monitor Progress
 
 Real-time updates via Server-Sent Events:
+
 - **Concurrency**: Current parallel API requests (adjusts automatically)
 - **Tokens Used**: Running count towards rate limits
 - **Chunks**: Visual grid showing status (pending → processing → completed)
@@ -135,6 +168,7 @@ Real-time updates via Server-Sent Events:
 ### 4. Export Results
 
 When processing completes:
+
 - **Copy to Clipboard**: One-click copy button
 - **Download as .txt**: Save to local file
 - **Process Another**: Start a new video
@@ -237,6 +271,7 @@ services:
 > **For more details, see the official Gemini API Rate Limits documentation: [https://ai.google.dev/gemini-api/docs/rate-limits](https://ai.google.dev/gemini-api/docs/rate-limits)**
 
 The app automatically:
+
 - Detects rate limits (429 errors)
 - Reduces concurrency (multiplicative decrease)
 - Respects `Retry-After` headers
@@ -249,6 +284,7 @@ Two prompts power the AI analysis:
 ### 1. Chunk Analysis (`prompts/chunk_analysis_prompt.md`)
 
 Analyzes individual video chunks:
+
 - Extracts events with timestamps, types, titles, descriptions
 - Uses `{{CHUNK_START_OFFSET}}` to calculate absolute timestamps
 - Outputs structured JSON (validated with Zod schema)
@@ -256,6 +292,7 @@ Analyzes individual video chunks:
 ### 2. Consolidation (`prompts/consolidation_prompt.md`)
 
 Merges chunk results into final document:
+
 - Deduplicates across boundaries
 - Maintains strict chronological order
 - Formats hierarchically (Main Topics → Sub-points)
@@ -361,11 +398,13 @@ docker compose up --build --no-cache
 ### Rate Limits
 
 The app handles rate limits automatically:
+
 - AIMD algorithm adjusts concurrency
 - Respects `Retry-After` delays
 - UI shows current status
 
 If persistent:
+
 - Lower FPS (reduces tokens per chunk)
 - Increase chunk size (fewer API calls)
 - Check remaining quota in AI Studio
@@ -378,12 +417,13 @@ Edit `docker-compose.yml`:
 
 ```yaml
 ports:
-  - "8080:3000"  # Use port 8080 instead
+  - "8080:3000" # Use port 8080 instead
 ```
 
 ### Timestamps Out of Order
 
 This was a known issue and has been fixed:
+
 - Chunk analysis now uses absolute timestamps
 - Consolidation enforces strict chronological sorting
 - If you still see issues, rebuild: `docker compose build --no-cache`
@@ -391,6 +431,7 @@ This was a known issue and has been fixed:
 ## Contributing
 
 Contributions welcome! Please:
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes

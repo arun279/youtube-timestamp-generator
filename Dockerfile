@@ -8,7 +8,8 @@ WORKDIR /app
 # Copy package files
 COPY web/package*.json ./
 # Use npm install on first build (generates package-lock.json)
-# Use --legacy-peer-deps to handle React 19 peer dependency issues
+# TODO: Remove --legacy-peer-deps once @radix-ui packages support React 19
+# Check: npm install (without flag) - if it works, remove this
 RUN npm install --legacy-peer-deps
 
 # Builder stage
