@@ -6,22 +6,23 @@
 import { NextRequest } from 'next/server';
 import { getJob, getJobStats } from '@/lib/jobs';
 import { SSE_CONFIG } from '@/lib/constants';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
   const { jobId } = await params;
-  console.warn(`[GET /api/jobs/${jobId}/stream] SSE connection initiated`);
+  logger.debug('SSE', 'Connection initiated', { jobId });
 
   const job = getJob(jobId);
 
   if (!job) {
-    console.error(`[GET /api/jobs/${jobId}/stream] Job not found`);
+    logger.warn('SSE', 'Job not found', { jobId });
     return new Response('Job not found', { status: 404 });
   }
 
-  console.warn(`[GET /api/jobs/${jobId}/stream] Job found, starting SSE stream`);
+  logger.debug('SSE', 'Starting stream', { jobId });
 
   // Create readable stream for SSE
   const stream = new ReadableStream({

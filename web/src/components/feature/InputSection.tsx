@@ -30,12 +30,13 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Configuration state
+  // Configuration state - defaults optimized for free tier
   const [config, setConfig] = useState<Partial<ProcessingConfig>>({
-    chunkSize: 25,
+    chunkSize: 15, // 15 min default for safety margin
     fps: 0.5,
-    resolution: 'low',
+    resolution: 'low', // Low resolution for faster processing
     model: 'gemini-2.5-flash',
+    tier: 'free',
     concurrencyMode: 'adaptive',
   });
 
@@ -67,10 +68,11 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
 
       const fullConfig: ProcessingConfig = {
         videoUrl: normalizedUrl,
-        chunkSize: config.chunkSize || 25,
+        chunkSize: config.chunkSize || 15,
         fps: config.fps || 0.5,
         resolution: config.resolution || 'low',
-        model: config.model || 'gemini-2.0-flash-exp',
+        model: config.model || 'gemini-2.5-flash',
+        tier: config.tier || 'free',
         concurrencyMode: config.concurrencyMode || 'adaptive',
       };
 
@@ -155,10 +157,11 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
         {duration && (
           <TokenCalculator
             duration={duration}
-            chunkSize={config.chunkSize || 25}
+            chunkSize={config.chunkSize || 15}
             fps={config.fps || 0.5}
             resolution={config.resolution || 'low'}
-            tierLimit={apiKeyInfo.tpm || 250_000}
+            model={config.model || 'gemini-2.5-flash'}
+            tier={config.tier || 'free'}
           />
         )}
 

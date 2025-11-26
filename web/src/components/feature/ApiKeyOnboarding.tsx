@@ -42,7 +42,7 @@ export function ApiKeyOnboarding({ onSuccess }: ApiKeyOnboardingProps) {
       if (result.isValid) {
         // Save to storage
         await ApiKeyStorage.save(apiKey.trim(), persist, {
-          tier: result.tier || 'unknown',
+          tier: result.tier || 'free',
           models: result.models || [],
         });
 

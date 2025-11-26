@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getJob } from '@/lib/jobs';
 import { processVideoInBackground } from '@/lib/process-video';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,12 +24,17 @@ export async function POST(request: NextRequest) {
 
     // Start processing (don't await - run in background)
     processVideoInBackground(jobId, apiKey).catch((error) => {
-      console.error(`[process-video] Error processing job ${jobId}:`, error);
+      logger.error('API', 'Error processing job', {
+        jobId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
     });
 
     return NextResponse.json({ success: true, jobId });
   } catch (error) {
-    console.error('[process-video] Error:', error);
+    logger.error('API', 'Process video error', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
     return NextResponse.json({ error: 'Failed to start processing' }, { status: 500 });
   }
 }

@@ -1,22 +1,33 @@
 /**
  * Video processing logic
  * Separate module so it can be imported by both API routes and Server Actions
+ *
+ * Uses AdaptiveRateLimiter with dual-track sliding window:
+ * - Estimates (from countTokens or formula) for admission control
+ * - Actuals (from usageMetadata) to update window state
  */
 
 import {
   getJob,
   updateJobStatus,
   updateChunkStatus,
-  updateConcurrency,
   addTokensUsed,
   setResult,
   setError,
 } from './jobs';
-import { AIMDQueue } from './queue';
-import { analyzeChunk, consolidateChunks } from './gemini';
+import { AdaptiveRateLimiter, getRateLimits } from './rate-limits';
+import {
+  analyzeChunk,
+  consolidateChunks,
+  countChunkTokens,
+  countConsolidationTokens,
+} from './gemini';
 import { DEFAULT_PROMPTS } from './prompts/defaults';
 import { calculateTokens } from './utils';
+import { logger } from './logger';
+import { QUEUE_CONFIG, RATE_LIMIT_CONFIG } from './constants';
 import type { ChunkAnalysis } from '@/types';
+import PQueue from 'p-queue';
 
 /**
  * Background processing function
@@ -25,95 +36,164 @@ import type { ChunkAnalysis } from '@/types';
 export async function processVideoInBackground(jobId: string, apiKey: string): Promise<void> {
   const job = getJob(jobId);
   if (!job) {
-    console.error(`[processVideoInBackground] Job ${jobId} not found`);
+    logger.error('ProcessVideo', 'Job not found', { jobId });
     return;
   }
 
-  console.warn(
-    `[processVideoInBackground] Starting processing for job ${jobId} with ${job.chunks.length} chunks`
-  );
+  logger.info('ProcessVideo', 'Starting job processing', {
+    jobId,
+    chunkCount: job.chunks.length,
+    resolution: job.config.resolution,
+    fps: job.config.fps,
+    chunkSizeMinutes: job.config.chunkSize,
+  });
 
   try {
     updateJobStatus(jobId, 'processing');
 
-    // Create AIMD queue with tier awareness
-    const queue = new AIMDQueue({
-      tier: 'free', // TODO: Get from API key validation stored in job
-      tpm: 250_000,
-      rpm: 15,
-      onConcurrencyChange: (from, to, reason) => {
-        updateConcurrency(jobId, to);
-        console.warn(`[${jobId}] Concurrency: ${from} → ${to} (${reason})`);
-      },
-      onRateLimit: (retryAfterMs) => {
-        console.warn(`[${jobId}] Rate limited. Retrying in ${retryAfterMs}ms`);
-      },
-      onRetry: (attempt, maxRetries, error, metadata) => {
-        if (metadata && typeof metadata === 'object' && 'chunkId' in metadata) {
-          const chunkId = (metadata as { chunkId: number }).chunkId;
-          updateChunkStatus(jobId, chunkId, 'retrying');
-          console.warn(
-            `[${jobId}] Chunk ${chunkId + 1} retry attempt ${attempt}/${maxRetries}: ${error.message}`
-          );
-        }
-      },
+    // Get rate limits for model and tier
+    const limits = getRateLimits(job.config.model, job.config.tier);
+    logger.info('ProcessVideo', 'Using rate limits', {
+      jobId,
+      model: job.config.model,
+      tier: job.config.tier,
+      rpm: limits.rpm,
+      tpm: limits.tpm,
     });
 
-    // Process all chunks
+    // Create adaptive rate limiter with dual-track sliding window
+    const rateLimiter = new AdaptiveRateLimiter({
+      tpm: limits.tpm,
+      rpm: limits.rpm,
+      initialSafetyMultiplier: RATE_LIMIT_CONFIG.initialSafetyMultiplier,
+      bufferPercent: RATE_LIMIT_CONFIG.limitBufferPercent,
+    });
+
+    // Create processing queue with concurrency limit
+    // Rate limiting is handled by AdaptiveRateLimiter, not p-queue
+    const queue = new PQueue({
+      concurrency: QUEUE_CONFIG.maxConcurrent,
+    });
+
+    // Process all chunks with rate limiting
     const chunkPromises = job.chunks.map((chunk) =>
-      queue.add(
-        async () => {
-          updateChunkStatus(jobId, chunk.id, 'processing');
+      queue.add(async () => {
+        const requestId = rateLimiter.generateRequestId();
+        const chunkLabel = `chunk-${chunk.id + 1}`;
 
-          const startTime = Date.now();
+        updateChunkStatus(jobId, chunk.id, 'processing');
+        const startTime = Date.now();
 
+        try {
+          // Step 1: Get token estimate (try countTokens, fallback to formula)
+          let estimatedTokens: number;
           try {
-            const result = await analyzeChunk(
+            estimatedTokens = await countChunkTokens(
               apiKey,
               job.config.videoUrl,
               chunk.startOffset,
               chunk.endOffset,
               DEFAULT_PROMPTS.chunkAnalysis,
               job.config.fps,
+              job.config.resolution,
               job.config.model
             );
-
-            const processingTime = Date.now() - startTime;
-
-            // Validate that the result has actual events
-            // Empty results indicate API failure or invalid chunk data
-            if (!result.events || result.events.length === 0) {
-              const errorMessage = `Chunk ${chunk.id + 1} returned empty result (no events found). This usually indicates an API issue or invalid video segment.`;
-              console.error(`[${jobId}]`, errorMessage);
-              throw new Error(errorMessage);
-            }
-
-            updateChunkStatus(jobId, chunk.id, 'completed', result, undefined, processingTime);
-
-            // Update token usage
+            logger.debug('ProcessVideo', 'Got token count from API', {
+              jobId,
+              chunkLabel,
+              estimatedTokens,
+            });
+          } catch {
+            // Fallback to formula-based estimation
             const duration = parseInt(chunk.endOffset) - parseInt(chunk.startOffset);
             const { totalTokens } = calculateTokens(
               duration,
               job.config.fps,
               job.config.resolution
             );
-            addTokensUsed(jobId, totalTokens);
-
-            console.warn(
-              `[${jobId}] Chunk ${chunk.id + 1} completed in ${processingTime}ms with ${result.events.length} events`
-            );
-
-            return result;
-          } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-            console.error(`[${jobId}] Chunk ${chunk.id + 1} failed:`, errorMessage);
-            updateChunkStatus(jobId, chunk.id, 'error', undefined, errorMessage);
-            throw error;
+            estimatedTokens = totalTokens;
+            logger.debug('ProcessVideo', 'Using formula-based token estimate', {
+              jobId,
+              chunkLabel,
+              estimatedTokens,
+            });
           }
-        },
-        undefined,
-        { chunkId: chunk.id }
-      )
+
+          // Step 2: Acquire rate limit capacity
+          const acquireStart = Date.now();
+          await rateLimiter.acquire(estimatedTokens, requestId);
+          const acquireTime = Date.now() - acquireStart;
+
+          if (acquireTime > 100) {
+            logger.info('ProcessVideo', 'Rate limit wait', {
+              jobId,
+              chunkLabel,
+              waitMs: acquireTime,
+            });
+          }
+
+          // Step 3: Make API call with resolution parameter
+          const { analysis, usageMetadata } = await analyzeChunk(
+            apiKey,
+            job.config.videoUrl,
+            chunk.startOffset,
+            chunk.endOffset,
+            DEFAULT_PROMPTS.chunkAnalysis,
+            job.config.fps,
+            job.config.resolution, // Pass resolution to API
+            job.config.model
+          );
+
+          // Step 4: Record actual tokens for rate limiter adaptation
+          rateLimiter.recordActual(requestId, usageMetadata.promptTokenCount);
+
+          // Log estimation accuracy for debugging
+          const accuracy = usageMetadata.promptTokenCount / estimatedTokens;
+          if (Math.abs(accuracy - 1.0) > 0.2) {
+            logger.warn('ProcessVideo', 'Token estimation inaccuracy', {
+              jobId,
+              chunkLabel,
+              estimated: estimatedTokens,
+              actual: usageMetadata.promptTokenCount,
+              accuracy: accuracy.toFixed(2),
+            });
+          }
+
+          const processingTime = Date.now() - startTime;
+
+          // Validate result
+          if (!analysis.events || analysis.events.length === 0) {
+            throw new Error(
+              `Chunk ${chunk.id + 1} returned empty result (no events found). ` +
+                `This usually indicates an API issue or invalid video segment.`
+            );
+          }
+
+          updateChunkStatus(jobId, chunk.id, 'completed', analysis, undefined, processingTime);
+
+          // Update token usage with actual tokens
+          addTokensUsed(jobId, usageMetadata.promptTokenCount);
+
+          logger.info('ProcessVideo', 'Chunk completed', {
+            jobId,
+            chunkLabel,
+            processingMs: processingTime,
+            eventCount: analysis.events.length,
+            tokensUsed: usageMetadata.promptTokenCount,
+          });
+
+          return analysis;
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          logger.error('ProcessVideo', 'Chunk failed', {
+            jobId,
+            chunkLabel,
+            error: errorMessage,
+          });
+          updateChunkStatus(jobId, chunk.id, 'error', undefined, errorMessage);
+          throw error;
+        }
+      })
     );
 
     // Wait for all chunks to complete
@@ -122,7 +202,11 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
     // Check if any chunks failed
     const failedChunks = results.filter((r) => r.status === 'rejected');
     if (failedChunks.length > 0) {
-      console.error(`[${jobId}] ${failedChunks.length} chunks failed`);
+      logger.error('ProcessVideo', 'Some chunks failed', {
+        jobId,
+        failedCount: failedChunks.length,
+        totalChunks: job.chunks.length,
+      });
       setError(jobId, `${failedChunks.length} chunks failed to process`);
       return;
     }
@@ -132,10 +216,34 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
       .filter((r): r is PromiseFulfilledResult<ChunkAnalysis> => r.status === 'fulfilled')
       .map((r) => r.value);
 
-    console.warn(`[${jobId}] All chunks completed. Starting consolidation...`);
+    logger.info('ProcessVideo', 'All chunks completed, starting consolidation', {
+      jobId,
+      successfulChunks: chunkAnalyses.length,
+      rateLimiterMetrics: rateLimiter.getMetrics(),
+    });
 
-    // Consolidate all chunks with retry logic
+    // Consolidate all chunks with rate limiting
     updateJobStatus(jobId, 'consolidating');
+
+    // Get token estimate for consolidation
+    let consolidationTokens: number;
+    try {
+      consolidationTokens = await countConsolidationTokens(
+        apiKey,
+        chunkAnalyses,
+        DEFAULT_PROMPTS.consolidation,
+        job.config.model
+      );
+    } catch {
+      // Fallback: estimate ~4 chars per token
+      const consolidationInput = `${DEFAULT_PROMPTS.consolidation}\n\n${JSON.stringify(chunkAnalyses)}`;
+      consolidationTokens = Math.ceil(consolidationInput.length / 4);
+    }
+
+    logger.info('ProcessVideo', 'Consolidation token estimate', {
+      jobId,
+      estimatedTokens: consolidationTokens,
+    });
 
     const maxConsolidationRetries = 5;
     let consolidationAttempt = 0;
@@ -143,35 +251,55 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
 
     while (consolidationAttempt <= maxConsolidationRetries) {
       try {
-        finalTimestamps = await consolidateChunks(
+        const requestId = rateLimiter.generateRequestId();
+
+        // Acquire rate limit for consolidation
+        logger.debug('ProcessVideo', 'Acquiring rate limit for consolidation', {
+          jobId,
+          attempt: consolidationAttempt + 1,
+          estimatedTokens: consolidationTokens,
+        });
+
+        await rateLimiter.acquire(consolidationTokens, requestId);
+
+        // Make consolidation API call
+        const { text, usageMetadata } = await consolidateChunks(
           apiKey,
           chunkAnalyses,
           DEFAULT_PROMPTS.consolidation,
           job.config.model
         );
-        break; // Success - exit retry loop
+
+        // Record actual tokens
+        rateLimiter.recordActual(requestId, usageMetadata.promptTokenCount);
+
+        finalTimestamps = text;
+        break; // Success
       } catch (error) {
         consolidationAttempt++;
 
         if (consolidationAttempt > maxConsolidationRetries) {
-          // Max retries exceeded
           throw error;
         }
 
-        // Extract retry delay from error message
-        let retryDelayMs = 1000 * Math.pow(2, consolidationAttempt); // Default exponential backoff
+        // Calculate retry delay with exponential backoff
+        let retryDelayMs = 1000 * Math.pow(2, consolidationAttempt);
 
+        // Try to parse Gemini's "retry in XX.XXs" format
         if (error instanceof Error) {
-          // Try to parse Gemini's "retry in XX.XXs" format
           const match = error.message.match(/retry in ([\d.]+)s/i);
           if (match) {
             retryDelayMs = Math.ceil(parseFloat(match[1]) * 1000);
           }
         }
 
-        console.warn(
-          `[${jobId}] Consolidation attempt ${consolidationAttempt} failed. Retrying in ${retryDelayMs}ms...`
-        );
+        logger.warn('ProcessVideo', 'Consolidation attempt failed, retrying', {
+          jobId,
+          attempt: consolidationAttempt,
+          retryDelayMs,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+
         await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
       }
     }
@@ -180,11 +308,15 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
       throw new Error('Consolidation failed after all retries');
     }
 
-    console.warn(`[${jobId}] Consolidation complete. Job finished successfully.`);
+    logger.info('ProcessVideo', 'Job completed successfully', {
+      jobId,
+      finalMetrics: rateLimiter.getMetrics(),
+    });
+
     setResult(jobId, finalTimestamps);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`[${jobId}] Fatal error:`, errorMessage);
+    logger.error('ProcessVideo', 'Fatal error', { jobId, error: errorMessage });
     setError(jobId, errorMessage);
   }
 }

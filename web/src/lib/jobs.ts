@@ -12,6 +12,7 @@
 
 import type { Job, JobStatus, ChunkMetadata, JobLogEntry, ProcessingConfig } from '@/types';
 import { JOB_CONFIG } from './constants';
+import { logger } from './logger';
 
 // Ensure jobs Map is truly global across all Next.js runtime contexts
 declare global {
@@ -22,7 +23,7 @@ declare global {
 const jobs = globalThis.__jobsStore ?? new Map<string, Job>();
 if (!globalThis.__jobsStore) {
   globalThis.__jobsStore = jobs;
-  console.warn('[jobs] Initialized global jobs store');
+  logger.info('Jobs', 'Initialized global jobs store');
 }
 
 // Export for debugging
@@ -89,9 +90,10 @@ export function createJob(
 export function getJob(id: string): Job | undefined {
   const job = jobs.get(id);
   if (!job) {
-    console.warn(
-      `[jobs.getJob] Job ${id} not found. Available jobs: ${Array.from(jobs.keys()).join(', ')}`
-    );
+    logger.warn('Jobs', 'Job not found', {
+      jobId: id,
+      availableJobs: Array.from(jobs.keys()),
+    });
   }
   return job;
 }

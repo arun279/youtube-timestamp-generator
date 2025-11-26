@@ -15,6 +15,7 @@ import { InputSection } from './InputSection';
 import { ProcessingView } from './ProcessingView';
 import { ResultsView } from './ResultsView';
 import { ApiKeyStorage } from '@/lib/storage';
+import { getRateLimits } from '@/lib/rate-limits';
 import type { ApiKeyValidationResult } from '@/types';
 
 type AppState = 'onboarding' | 'ready' | 'processing' | 'completed';
@@ -28,12 +29,15 @@ export function MainApp() {
   useEffect(() => {
     const stored = ApiKeyStorage.get();
     if (stored) {
+      // Get rate limits for the stored tier (default to gemini-2.5-flash)
+      const limits = getRateLimits('gemini-2.5-flash', stored.tier);
+
       setApiKeyInfo({
         isValid: true,
         tier: stored.tier,
         models: stored.models,
-        tpm: stored.tier === 'paid' ? 4_000_000 : 250_000,
-        rpm: stored.tier === 'paid' ? 360 : 15,
+        tpm: limits.tpm,
+        rpm: limits.rpm,
       });
       setState('ready');
     }
