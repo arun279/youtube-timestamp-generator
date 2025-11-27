@@ -296,18 +296,20 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
             const startTime = Date.now();
 
             // Step 1: Get token estimate
+            const chunkOptions = {
+              apiKey,
+              videoUrl: job.config.videoUrl,
+              startOffset: chunk.startOffset,
+              endOffset: chunk.endOffset,
+              prompt: DEFAULT_PROMPTS.chunkAnalysis,
+              fps: job.config.fps,
+              resolution: job.config.resolution,
+              model: job.config.model,
+            };
+
             let estimatedTokens: number;
             try {
-              estimatedTokens = await countChunkTokens(
-                apiKey,
-                job.config.videoUrl,
-                chunk.startOffset,
-                chunk.endOffset,
-                DEFAULT_PROMPTS.chunkAnalysis,
-                job.config.fps,
-                job.config.resolution,
-                job.config.model
-              );
+              estimatedTokens = await countChunkTokens(chunkOptions);
               logger.debug('ProcessVideo', 'Got token count from API', {
                 jobId,
                 chunkLabel,
@@ -347,16 +349,7 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
             }
 
             // Step 3: Make API call
-            const { analysis, usageMetadata } = await analyzeChunk(
-              apiKey,
-              job.config.videoUrl,
-              chunk.startOffset,
-              chunk.endOffset,
-              DEFAULT_PROMPTS.chunkAnalysis,
-              job.config.fps,
-              job.config.resolution,
-              job.config.model
-            );
+            const { analysis, usageMetadata } = await analyzeChunk(chunkOptions);
 
             // Step 4: Record actual tokens
             rateLimiter.recordActual(requestId, usageMetadata.promptTokenCount);

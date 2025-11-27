@@ -14,10 +14,11 @@ import { TOKEN_CONSTANTS } from '@/lib/constants';
 import type { ApiKeyValidationResult, MediaResolutionType, ProcessingConfig } from '@/types';
 
 interface AdvancedSettingsProps {
-  config: Partial<ProcessingConfig>;
-  apiKeyInfo: ApiKeyValidationResult;
-  duration: number;
-  onChange: (config: Partial<ProcessingConfig>) => void;
+  readonly config: Partial<ProcessingConfig>;
+  /** Reserved for future tier-specific UI enhancements */
+  readonly apiKeyInfo?: ApiKeyValidationResult;
+  readonly duration: number;
+  readonly onChange: (config: Partial<ProcessingConfig>) => void;
 }
 
 // Resolution options with metadata from official docs
@@ -49,7 +50,12 @@ const RESOLUTION_OPTIONS: {
   },
 ];
 
-export function AdvancedSettings({ config, duration, onChange }: AdvancedSettingsProps) {
+export function AdvancedSettings({
+  config,
+  apiKeyInfo: _apiKeyInfo,
+  duration,
+  onChange,
+}: AdvancedSettingsProps) {
   const updateConfig = (updates: Partial<ProcessingConfig>) => {
     onChange({ ...config, ...updates });
   };
@@ -135,7 +141,7 @@ export function AdvancedSettings({ config, duration, onChange }: AdvancedSetting
           value={[currentFps]}
           onValueChange={([value]) => updateConfig({ fps: value })}
           min={0.2}
-          max={2.0}
+          max={2}
           step={0.1}
           className="py-4"
         />
@@ -191,7 +197,7 @@ export function AdvancedSettings({ config, duration, onChange }: AdvancedSetting
                 : 'border-input hover:bg-accent'
             }`}
           >
-            🤖 Adaptive
+            <span>🤖 Adaptive</span>
             <span className="mt-0.5 block text-xs opacity-70">Recommended</span>
           </button>
           <button
@@ -202,7 +208,7 @@ export function AdvancedSettings({ config, duration, onChange }: AdvancedSetting
                 : 'border-input hover:bg-accent'
             }`}
           >
-            🎛️ Manual
+            <span>🎛️ Manual</span>
             <span className="mt-0.5 block text-xs opacity-70">Fixed rate</span>
           </button>
         </div>
