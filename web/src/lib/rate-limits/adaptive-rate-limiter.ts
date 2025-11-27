@@ -17,8 +17,9 @@
  * - Reactive adjustment based on ground truth
  */
 
-import { logger } from '../logger';
 import { v4 as uuidv4 } from 'uuid';
+
+import { logger } from '../logger';
 
 interface TokenEntry {
   /** When the request was made */
@@ -90,7 +91,7 @@ export class AdaptiveRateLimiter {
     this.rpmLimit = Math.max(1, config.rpm - 1); // Keep at least 1 RPM
 
     this.safetyMultiplier = config.initialSafetyMultiplier ?? 1.2;
-    this.minSafetyMultiplier = config.minSafetyMultiplier ?? 1.0;
+    this.minSafetyMultiplier = config.minSafetyMultiplier ?? 1;
     this.maxSafetyMultiplier = config.maxSafetyMultiplier ?? 2.5;
 
     logger.info('AdaptiveRateLimiter', 'Initialized', {
@@ -183,7 +184,7 @@ export class AdaptiveRateLimiter {
       const waitTime = this.calculateWaitTime(safeEstimate);
 
       if (iteration === 1) {
-        const bottleneck = !tpmOk ? 'TPM' : 'RPM';
+        const bottleneck = tpmOk ? 'RPM' : 'TPM';
         logger.info('AdaptiveRateLimiter', 'Waiting for capacity', {
           requestId,
           bottleneck,
@@ -353,7 +354,7 @@ export class AdaptiveRateLimiter {
     const avgAccuracy =
       this.accuracyHistory.length > 0
         ? this.accuracyHistory.reduce((a, b) => a + b, 0) / this.accuracyHistory.length
-        : 1.0;
+        : 1;
 
     return {
       tokensUsed,

@@ -5,15 +5,15 @@
  * Shows when user doesn't have a valid API key stored
  * Handles validation and storage
  */
-
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { AlertCircle, CheckCircle2, ExternalLink, Key, Loader2 } from 'lucide-react';
+
 import { validateApiKey } from '@/app/actions/validate-key';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { ApiKeyStorage } from '@/lib/storage';
 import type { ApiKeyValidationResult } from '@/types';
 

@@ -4,11 +4,11 @@
  * Processing View Component
  * Shows real-time progress via SSE
  */
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Activity, Clock, Loader2, Zap } from 'lucide-react';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Zap, Clock, Activity } from 'lucide-react';
 import type { Job, JobLogEntry } from '@/types';
 
 interface ProcessingViewProps {

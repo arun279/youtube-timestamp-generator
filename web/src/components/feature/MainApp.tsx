@@ -8,15 +8,16 @@
  * 3. Processing visualization
  * 4. Results display
  */
+import { useEffect, useState } from 'react';
 
-import { useState, useEffect } from 'react';
+import { getRateLimits } from '@/lib/rate-limits';
+import { ApiKeyStorage } from '@/lib/storage';
+import type { ApiKeyValidationResult } from '@/types';
+
 import { ApiKeyOnboarding } from './ApiKeyOnboarding';
 import { InputSection } from './InputSection';
 import { ProcessingView } from './ProcessingView';
 import { ResultsView } from './ResultsView';
-import { ApiKeyStorage } from '@/lib/storage';
-import { getRateLimits } from '@/lib/rate-limits';
-import type { ApiKeyValidationResult } from '@/types';
 
 type AppState = 'onboarding' | 'ready' | 'processing' | 'completed';
 

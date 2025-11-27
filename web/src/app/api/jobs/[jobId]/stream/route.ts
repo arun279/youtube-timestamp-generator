@@ -4,8 +4,9 @@
  */
 
 import { NextRequest } from 'next/server';
-import { getJob, getJobStats } from '@/lib/jobs';
+
 import { SSE_CONFIG } from '@/lib/constants';
+import { getJob, getJobStats } from '@/lib/jobs';
 import { logger } from '@/lib/logger';
 
 export async function GET(

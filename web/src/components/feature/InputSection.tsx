@@ -4,20 +4,21 @@
  * Input Section Component
  * Allows user to input YouTube URL and configure processing settings
  */
-
 import { useState } from 'react';
+import { AlertCircle, Loader2, Play, Settings2, Youtube } from 'lucide-react';
+
+import { createProcessingJob } from '@/app/actions/create-job';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, Loader2, Play, Settings2, Youtube } from 'lucide-react';
 import { useYouTubeDuration } from '@/hooks/use-youtube-duration';
-import { createProcessingJob } from '@/app/actions/create-job';
 import { ApiKeyStorage } from '@/lib/storage';
 import { formatDuration, normalizeYouTubeUrl } from '@/lib/utils';
 import type { ApiKeyValidationResult, ProcessingConfig } from '@/types';
-import { TokenCalculator } from './TokenCalculator';
+
 import { AdvancedSettings } from './AdvancedSettings';
+import { TokenCalculator } from './TokenCalculator';
 
 interface InputSectionProps {
   apiKeyInfo: ApiKeyValidationResult;
