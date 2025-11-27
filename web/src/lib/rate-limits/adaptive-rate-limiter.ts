@@ -31,6 +31,7 @@ interface TokenEntry {
   actual: number | null;
 }
 
+/** @public Return type of AdaptiveRateLimiter.getMetrics() */
 export interface AdaptiveMetrics {
   /** Current tokens in window (using actual where available, estimated otherwise) */
   tokensUsed: number;
@@ -52,6 +53,7 @@ export interface AdaptiveMetrics {
   pendingRequests: number;
 }
 
+/** @public Configuration options for AdaptiveRateLimiter constructor */
 export interface RateLimiterConfig {
   /** Tokens per minute limit */
   tpm: number;

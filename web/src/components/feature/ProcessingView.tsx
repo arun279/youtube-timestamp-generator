@@ -5,7 +5,7 @@
  * Shows real-time progress via SSE
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Loader2, Zap, Clock, Activity } from 'lucide-react';
@@ -19,6 +19,28 @@ interface ProcessingViewProps {
 export function ProcessingView({ jobId, onComplete }: ProcessingViewProps) {
   const [job, setJob] = useState<Job | null>(null);
   const [logs, setLogs] = useState<JobLogEntry[]>([]);
+  const logContainerRef = useRef<HTMLDivElement>(null);
+  const userScrolledRef = useRef(false);
+
+  // Update logs while preserving scroll position if user has scrolled up
+  const updateLogs = useCallback((newLogs: JobLogEntry[]) => {
+    const container = logContainerRef.current;
+    if (container) {
+      // Check if user is near bottom (within 50px)
+      const isNearBottom =
+        container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+      userScrolledRef.current = !isNearBottom;
+    }
+    setLogs(newLogs);
+  }, []);
+
+  // Auto-scroll to bottom when new logs arrive (if user hasn't scrolled up)
+  useEffect(() => {
+    const container = logContainerRef.current;
+    if (container && !userScrolledRef.current) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [logs]);
 
   useEffect(() => {
     // Fallback polling function
@@ -28,7 +50,7 @@ export function ProcessingView({ jobId, onComplete }: ProcessingViewProps) {
         if (response.ok) {
           const data = await response.json();
           setJob(data);
-          setLogs(data.logs || []);
+          updateLogs(data.logs || []);
 
           if (data.status === 'completed') {
             onComplete();
@@ -56,7 +78,7 @@ export function ProcessingView({ jobId, onComplete }: ProcessingViewProps) {
 
           // Update logs immediately from SSE
           if (data.data.logs) {
-            setLogs(data.data.logs);
+            updateLogs(data.data.logs);
           }
 
           // Check if complete
@@ -83,7 +105,7 @@ export function ProcessingView({ jobId, onComplete }: ProcessingViewProps) {
     return () => {
       eventSource.close();
     };
-  }, [jobId, onComplete]);
+  }, [jobId, onComplete, updateLogs]);
 
   if (!job) {
     return (
@@ -211,10 +233,13 @@ export function ProcessingView({ jobId, onComplete }: ProcessingViewProps) {
             <CardDescription>Real-time processing events</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="max-h-64 space-y-1 overflow-y-auto font-mono text-xs">
+            <div
+              ref={logContainerRef}
+              className="max-h-64 space-y-1 overflow-y-auto font-mono text-xs"
+            >
               {logs.map((log, i) => (
                 <div
-                  key={i}
+                  key={`${log.timestamp}-${i}`}
                   className={`rounded px-2 py-1 ${
                     log.level === 'error'
                       ? 'bg-red-50 text-red-700'

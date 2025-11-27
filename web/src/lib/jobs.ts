@@ -26,7 +26,7 @@ if (!globalThis.__jobsStore) {
   logger.info('Jobs', 'Initialized global jobs store');
 }
 
-// Export for debugging
+/** @public Debug utility for inspecting job store */
 export { jobs };
 
 // Cleanup interval
@@ -159,21 +159,6 @@ export function updateChunkStatus(
 }
 
 /**
- * Update concurrency level
- */
-export function updateConcurrency(jobId: string, concurrency: number): void {
-  const job = jobs.get(jobId);
-  if (!job) return;
-
-  const oldConcurrency = job.currentConcurrency;
-  job.currentConcurrency = concurrency;
-
-  if (oldConcurrency !== concurrency) {
-    addLog(jobId, 'info', `Concurrency: ${oldConcurrency} → ${concurrency}`);
-  }
-}
-
-/**
  * Add tokens used
  */
 export function addTokensUsed(jobId: string, tokens: number): void {
@@ -257,6 +242,7 @@ export function getJobStats(jobId: string): {
 
 /**
  * Get all jobs (for debugging)
+ * @public
  */
 export function getAllJobs(): Job[] {
   return Array.from(jobs.values());
@@ -264,6 +250,7 @@ export function getAllJobs(): Job[] {
 
 /**
  * Delete a job
+ * @public
  */
 export function deleteJob(id: string): void {
   jobs.delete(id);
@@ -271,6 +258,7 @@ export function deleteJob(id: string): void {
 
 /**
  * Clear all jobs (for testing)
+ * @public
  */
 export function clearAllJobs(): void {
   jobs.clear();

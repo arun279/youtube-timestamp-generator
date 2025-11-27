@@ -5,6 +5,10 @@
  * Uses AdaptiveRateLimiter with dual-track sliding window:
  * - Estimates (from countTokens or formula) for admission control
  * - Actuals (from usageMetadata) to update window state
+ *
+ * Failure handling uses circuit breaker pattern:
+ * - 3 consecutive failures = fail job (sustained issue)
+ * - 5 total failures = fail job (too unstable)
  */
 
 import {
@@ -14,6 +18,7 @@ import {
   addTokensUsed,
   setResult,
   setError,
+  addLog,
 } from './jobs';
 import { AdaptiveRateLimiter, getRateLimits } from './rate-limits';
 import {
@@ -25,9 +30,197 @@ import {
 import { DEFAULT_PROMPTS } from './prompts/defaults';
 import { calculateTokens } from './utils';
 import { logger } from './logger';
-import { QUEUE_CONFIG, RATE_LIMIT_CONFIG } from './constants';
+import { QUEUE_CONFIG, RATE_LIMIT_CONFIG, FAILURE_CONFIG } from './constants';
 import type { ChunkAnalysis } from '@/types';
 import PQueue from 'p-queue';
+
+/**
+ * Job failure tracker
+ * Implements circuit breaker pattern for API health
+ */
+class FailureTracker {
+  private consecutiveFailures = 0;
+  private totalFailures = 0;
+  private readonly jobId: string;
+
+  constructor(jobId: string) {
+    this.jobId = jobId;
+  }
+
+  /**
+   * Record a successful task completion
+   * Resets consecutive failure counter
+   */
+  recordSuccess(): void {
+    this.consecutiveFailures = 0;
+  }
+
+  /**
+   * Record a task failure
+   * @returns true if job should continue, false if thresholds exceeded
+   */
+  recordFailure(taskName: string, error: Error): boolean {
+    this.consecutiveFailures++;
+    this.totalFailures++;
+
+    logger.warn('FailureTracker', 'Task failed', {
+      jobId: this.jobId,
+      taskName,
+      consecutiveFailures: this.consecutiveFailures,
+      totalFailures: this.totalFailures,
+      maxConsecutive: FAILURE_CONFIG.maxConsecutiveFailures,
+      maxTotal: FAILURE_CONFIG.maxTotalFailures,
+      error: error.message.slice(0, 200),
+    });
+
+    addLog(
+      this.jobId,
+      'warn',
+      `${taskName} failed (${this.consecutiveFailures} consecutive, ${this.totalFailures} total)`
+    );
+
+    // Check thresholds
+    if (this.consecutiveFailures >= FAILURE_CONFIG.maxConsecutiveFailures) {
+      logger.error('FailureTracker', 'Consecutive failure threshold exceeded', {
+        jobId: this.jobId,
+        consecutiveFailures: this.consecutiveFailures,
+        threshold: FAILURE_CONFIG.maxConsecutiveFailures,
+      });
+      return false;
+    }
+
+    if (this.totalFailures >= FAILURE_CONFIG.maxTotalFailures) {
+      logger.error('FailureTracker', 'Total failure threshold exceeded', {
+        jobId: this.jobId,
+        totalFailures: this.totalFailures,
+        threshold: FAILURE_CONFIG.maxTotalFailures,
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Get failure reason for error message
+   */
+  getFailureReason(): string {
+    if (this.consecutiveFailures >= FAILURE_CONFIG.maxConsecutiveFailures) {
+      return `${this.consecutiveFailures} consecutive failures - API may be unavailable`;
+    }
+    if (this.totalFailures >= FAILURE_CONFIG.maxTotalFailures) {
+      return `${this.totalFailures} total failures - too many errors`;
+    }
+    return 'Unknown failure';
+  }
+
+  /**
+   * Check if job should be aborted
+   */
+  shouldAbort(): boolean {
+    return (
+      this.consecutiveFailures >= FAILURE_CONFIG.maxConsecutiveFailures ||
+      this.totalFailures >= FAILURE_CONFIG.maxTotalFailures
+    );
+  }
+
+  getStats() {
+    return {
+      consecutiveFailures: this.consecutiveFailures,
+      totalFailures: this.totalFailures,
+    };
+  }
+}
+
+/**
+ * Extract retry delay from Gemini error message
+ * Gemini returns "retry in XX.XXs" in error messages
+ */
+function extractRetryDelay(error: Error): number {
+  const match = error.message.match(/retry in ([\d.]+)s/i);
+  if (match?.[1]) {
+    return Math.ceil(parseFloat(match[1]) * 1000);
+  }
+  return 0;
+}
+
+/**
+ * Calculate backoff delay for retries
+ */
+function calculateBackoff(attempt: number, error?: Error): number {
+  // First, try to use Gemini's suggested retry delay
+  if (error) {
+    const geminiDelay = extractRetryDelay(error);
+    if (geminiDelay > 0) {
+      return Math.min(geminiDelay, FAILURE_CONFIG.maxRetryDelayMs);
+    }
+  }
+
+  // Fall back to exponential backoff
+  const exponentialDelay =
+    FAILURE_CONFIG.baseRetryDelayMs * Math.pow(FAILURE_CONFIG.backoffMultiplier, attempt);
+
+  // Add jitter (0-10% of delay) to prevent thundering herd
+  const jitter = Math.random() * exponentialDelay * 0.1;
+
+  return Math.min(exponentialDelay + jitter, FAILURE_CONFIG.maxRetryDelayMs);
+}
+
+/**
+ * Sleep utility
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Execute a task with retry on failure
+ * Uses global failure tracker for circuit breaker
+ */
+async function executeWithRetry<T>(
+  taskName: string,
+  task: () => Promise<T>,
+  failureTracker: FailureTracker,
+  onRetry?: (attempt: number) => void
+): Promise<T> {
+  let lastError: Error | undefined;
+  let attempt = 0;
+
+  while (!failureTracker.shouldAbort()) {
+    try {
+      const result = await task();
+      failureTracker.recordSuccess();
+      return result;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      attempt++;
+
+      // Record failure and check if we should continue
+      const shouldContinue = failureTracker.recordFailure(taskName, lastError);
+
+      if (!shouldContinue) {
+        // Thresholds exceeded, abort
+        break;
+      }
+
+      // Calculate retry delay
+      const delayMs = calculateBackoff(attempt, lastError);
+
+      logger.info('ProcessVideo', `${taskName} will retry`, {
+        attempt,
+        delayMs: Math.round(delayMs),
+      });
+
+      onRetry?.(attempt);
+
+      // Wait before retry
+      await sleep(delayMs);
+    }
+  }
+
+  // If we get here, either thresholds were exceeded or we ran out of retries
+  throw lastError || new Error(`${taskName} failed: ${failureTracker.getFailureReason()}`);
+}
 
 /**
  * Background processing function
@@ -47,6 +240,9 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
     fps: job.config.fps,
     chunkSizeMinutes: job.config.chunkSize,
   });
+
+  // Create failure tracker for this job
+  const failureTracker = new FailureTracker(jobId);
 
   try {
     updateJobStatus(jobId, 'processing');
@@ -70,25 +266,82 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
     });
 
     // Create processing queue with concurrency limit
-    // Rate limiting is handled by AdaptiveRateLimiter, not p-queue
     const queue = new PQueue({
       concurrency: QUEUE_CONFIG.maxConcurrent,
     });
 
-    // Process all chunks with rate limiting
+    // Track successful chunk results
+    const chunkResults: ChunkAnalysis[] = [];
+    let aborted = false;
+
+    // Process all chunks with rate limiting and failure tracking
     const chunkPromises = job.chunks.map((chunk) =>
       queue.add(async () => {
-        const requestId = rateLimiter.generateRequestId();
-        const chunkLabel = `chunk-${chunk.id + 1}`;
+        // Check if job was aborted due to failures
+        if (aborted || failureTracker.shouldAbort()) {
+          throw new Error('Job aborted due to too many failures');
+        }
 
-        updateChunkStatus(jobId, chunk.id, 'processing');
-        const startTime = Date.now();
+        const chunkLabel = `Chunk ${chunk.id + 1}`;
 
-        try {
-          // Step 1: Get token estimate (try countTokens, fallback to formula)
-          let estimatedTokens: number;
-          try {
-            estimatedTokens = await countChunkTokens(
+        const result = await executeWithRetry(
+          chunkLabel,
+          async () => {
+            const requestId = rateLimiter.generateRequestId();
+            const startTime = Date.now();
+
+            // Step 1: Get token estimate
+            let estimatedTokens: number;
+            try {
+              estimatedTokens = await countChunkTokens(
+                apiKey,
+                job.config.videoUrl,
+                chunk.startOffset,
+                chunk.endOffset,
+                DEFAULT_PROMPTS.chunkAnalysis,
+                job.config.fps,
+                job.config.resolution,
+                job.config.model
+              );
+              logger.debug('ProcessVideo', 'Got token count from API', {
+                jobId,
+                chunkLabel,
+                estimatedTokens,
+              });
+            } catch {
+              // Fallback to formula-based estimation
+              const duration = parseInt(chunk.endOffset) - parseInt(chunk.startOffset);
+              const { totalTokens } = calculateTokens(
+                duration,
+                job.config.fps,
+                job.config.resolution
+              );
+              estimatedTokens = totalTokens;
+              logger.debug('ProcessVideo', 'Using formula-based token estimate', {
+                jobId,
+                chunkLabel,
+                estimatedTokens,
+              });
+            }
+
+            // Step 2: Acquire rate limit capacity
+            const acquireStart = Date.now();
+            await rateLimiter.acquire(estimatedTokens, requestId);
+            const acquireTime = Date.now() - acquireStart;
+
+            // Mark as processing only after acquiring rate limit capacity
+            updateChunkStatus(jobId, chunk.id, 'processing');
+
+            if (acquireTime > 100) {
+              logger.info('ProcessVideo', 'Rate limit wait', {
+                jobId,
+                chunkLabel,
+                waitMs: acquireTime,
+              });
+            }
+
+            // Step 3: Make API call
+            const { analysis, usageMetadata } = await analyzeChunk(
               apiKey,
               job.config.videoUrl,
               chunk.startOffset,
@@ -98,131 +351,84 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
               job.config.resolution,
               job.config.model
             );
-            logger.debug('ProcessVideo', 'Got token count from API', {
+
+            // Step 4: Record actual tokens
+            rateLimiter.recordActual(requestId, usageMetadata.promptTokenCount);
+
+            // Log estimation accuracy
+            const accuracy = usageMetadata.promptTokenCount / estimatedTokens;
+            if (Math.abs(accuracy - 1.0) > 0.2) {
+              logger.warn('ProcessVideo', 'Token estimation inaccuracy', {
+                jobId,
+                chunkLabel,
+                estimated: estimatedTokens,
+                actual: usageMetadata.promptTokenCount,
+                accuracy: accuracy.toFixed(2),
+              });
+            }
+
+            const processingTime = Date.now() - startTime;
+
+            // Validate result
+            if (!analysis.events || analysis.events.length === 0) {
+              throw new Error(
+                `${chunkLabel} returned empty result (no events found). ` +
+                  `This usually indicates an API issue or invalid video segment.`
+              );
+            }
+
+            updateChunkStatus(jobId, chunk.id, 'completed', analysis, undefined, processingTime);
+            addTokensUsed(jobId, usageMetadata.promptTokenCount);
+
+            logger.info('ProcessVideo', 'Chunk completed', {
               jobId,
               chunkLabel,
-              estimatedTokens,
+              processingMs: processingTime,
+              eventCount: analysis.events.length,
+              tokensUsed: usageMetadata.promptTokenCount,
             });
-          } catch {
-            // Fallback to formula-based estimation
-            const duration = parseInt(chunk.endOffset) - parseInt(chunk.startOffset);
-            const { totalTokens } = calculateTokens(
-              duration,
-              job.config.fps,
-              job.config.resolution
-            );
-            estimatedTokens = totalTokens;
-            logger.debug('ProcessVideo', 'Using formula-based token estimate', {
-              jobId,
-              chunkLabel,
-              estimatedTokens,
-            });
+
+            return analysis;
+          },
+          failureTracker,
+          (attempt) => {
+            updateChunkStatus(jobId, chunk.id, 'retrying');
+            addLog(jobId, 'info', `${chunkLabel} retry attempt ${attempt}`);
           }
+        );
 
-          // Step 2: Acquire rate limit capacity
-          const acquireStart = Date.now();
-          await rateLimiter.acquire(estimatedTokens, requestId);
-          const acquireTime = Date.now() - acquireStart;
-
-          if (acquireTime > 100) {
-            logger.info('ProcessVideo', 'Rate limit wait', {
-              jobId,
-              chunkLabel,
-              waitMs: acquireTime,
-            });
-          }
-
-          // Step 3: Make API call with resolution parameter
-          const { analysis, usageMetadata } = await analyzeChunk(
-            apiKey,
-            job.config.videoUrl,
-            chunk.startOffset,
-            chunk.endOffset,
-            DEFAULT_PROMPTS.chunkAnalysis,
-            job.config.fps,
-            job.config.resolution, // Pass resolution to API
-            job.config.model
-          );
-
-          // Step 4: Record actual tokens for rate limiter adaptation
-          rateLimiter.recordActual(requestId, usageMetadata.promptTokenCount);
-
-          // Log estimation accuracy for debugging
-          const accuracy = usageMetadata.promptTokenCount / estimatedTokens;
-          if (Math.abs(accuracy - 1.0) > 0.2) {
-            logger.warn('ProcessVideo', 'Token estimation inaccuracy', {
-              jobId,
-              chunkLabel,
-              estimated: estimatedTokens,
-              actual: usageMetadata.promptTokenCount,
-              accuracy: accuracy.toFixed(2),
-            });
-          }
-
-          const processingTime = Date.now() - startTime;
-
-          // Validate result
-          if (!analysis.events || analysis.events.length === 0) {
-            throw new Error(
-              `Chunk ${chunk.id + 1} returned empty result (no events found). ` +
-                `This usually indicates an API issue or invalid video segment.`
-            );
-          }
-
-          updateChunkStatus(jobId, chunk.id, 'completed', analysis, undefined, processingTime);
-
-          // Update token usage with actual tokens
-          addTokensUsed(jobId, usageMetadata.promptTokenCount);
-
-          logger.info('ProcessVideo', 'Chunk completed', {
-            jobId,
-            chunkLabel,
-            processingMs: processingTime,
-            eventCount: analysis.events.length,
-            tokensUsed: usageMetadata.promptTokenCount,
-          });
-
-          return analysis;
-        } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          logger.error('ProcessVideo', 'Chunk failed', {
-            jobId,
-            chunkLabel,
-            error: errorMessage,
-          });
-          updateChunkStatus(jobId, chunk.id, 'error', undefined, errorMessage);
-          throw error;
-        }
+        chunkResults.push(result);
+        return result;
       })
     );
 
-    // Wait for all chunks to complete
-    const results = await Promise.allSettled(chunkPromises);
-
-    // Check if any chunks failed
-    const failedChunks = results.filter((r) => r.status === 'rejected');
-    if (failedChunks.length > 0) {
-      logger.error('ProcessVideo', 'Some chunks failed', {
-        jobId,
-        failedCount: failedChunks.length,
-        totalChunks: job.chunks.length,
-      });
-      setError(jobId, `${failedChunks.length} chunks failed to process`);
-      return;
+    // Wait for all chunks - but check for abort
+    try {
+      await Promise.all(chunkPromises);
+    } catch (error) {
+      // Check if this was due to failure thresholds
+      if (failureTracker.shouldAbort()) {
+        aborted = true;
+        throw new Error(failureTracker.getFailureReason());
+      }
+      throw error;
     }
 
-    // Extract successful results
-    const chunkAnalyses = results
-      .filter((r): r is PromiseFulfilledResult<ChunkAnalysis> => r.status === 'fulfilled')
-      .map((r) => r.value);
+    // Verify we have all chunks
+    if (chunkResults.length !== job.chunks.length) {
+      throw new Error(
+        `Only ${chunkResults.length}/${job.chunks.length} chunks completed successfully`
+      );
+    }
 
     logger.info('ProcessVideo', 'All chunks completed, starting consolidation', {
       jobId,
-      successfulChunks: chunkAnalyses.length,
+      successfulChunks: chunkResults.length,
       rateLimiterMetrics: rateLimiter.getMetrics(),
+      failureStats: failureTracker.getStats(),
     });
 
-    // Consolidate all chunks with rate limiting
+    // Consolidate all chunks with same failure tracking
     updateJobStatus(jobId, 'consolidating');
 
     // Get token estimate for consolidation
@@ -230,13 +436,13 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
     try {
       consolidationTokens = await countConsolidationTokens(
         apiKey,
-        chunkAnalyses,
+        chunkResults,
         DEFAULT_PROMPTS.consolidation,
         job.config.model
       );
     } catch {
       // Fallback: estimate ~4 chars per token
-      const consolidationInput = `${DEFAULT_PROMPTS.consolidation}\n\n${JSON.stringify(chunkAnalyses)}`;
+      const consolidationInput = `${DEFAULT_PROMPTS.consolidation}\n\n${JSON.stringify(chunkResults)}`;
       consolidationTokens = Math.ceil(consolidationInput.length / 4);
     }
 
@@ -245,78 +451,50 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
       estimatedTokens: consolidationTokens,
     });
 
-    const maxConsolidationRetries = 5;
-    let consolidationAttempt = 0;
-    let finalTimestamps: string | null = null;
-
-    while (consolidationAttempt <= maxConsolidationRetries) {
-      try {
+    // Execute consolidation with same retry logic
+    const finalTimestamps = await executeWithRetry(
+      'Consolidation',
+      async () => {
         const requestId = rateLimiter.generateRequestId();
 
-        // Acquire rate limit for consolidation
         logger.debug('ProcessVideo', 'Acquiring rate limit for consolidation', {
           jobId,
-          attempt: consolidationAttempt + 1,
           estimatedTokens: consolidationTokens,
         });
 
         await rateLimiter.acquire(consolidationTokens, requestId);
 
-        // Make consolidation API call
         const { text, usageMetadata } = await consolidateChunks(
           apiKey,
-          chunkAnalyses,
+          chunkResults,
           DEFAULT_PROMPTS.consolidation,
           job.config.model
         );
 
-        // Record actual tokens
         rateLimiter.recordActual(requestId, usageMetadata.promptTokenCount);
 
-        finalTimestamps = text;
-        break; // Success
-      } catch (error) {
-        consolidationAttempt++;
-
-        if (consolidationAttempt > maxConsolidationRetries) {
-          throw error;
-        }
-
-        // Calculate retry delay with exponential backoff
-        let retryDelayMs = 1000 * Math.pow(2, consolidationAttempt);
-
-        // Try to parse Gemini's "retry in XX.XXs" format
-        if (error instanceof Error) {
-          const match = error.message.match(/retry in ([\d.]+)s/i);
-          if (match) {
-            retryDelayMs = Math.ceil(parseFloat(match[1]) * 1000);
-          }
-        }
-
-        logger.warn('ProcessVideo', 'Consolidation attempt failed, retrying', {
-          jobId,
-          attempt: consolidationAttempt,
-          retryDelayMs,
-          error: error instanceof Error ? error.message : 'Unknown error',
-        });
-
-        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        return text;
+      },
+      failureTracker,
+      (attempt) => {
+        addLog(jobId, 'info', `Consolidation retry attempt ${attempt}`);
       }
-    }
-
-    if (!finalTimestamps) {
-      throw new Error('Consolidation failed after all retries');
-    }
+    );
 
     logger.info('ProcessVideo', 'Job completed successfully', {
       jobId,
       finalMetrics: rateLimiter.getMetrics(),
+      failureStats: failureTracker.getStats(),
     });
 
     setResult(jobId, finalTimestamps);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('ProcessVideo', 'Fatal error', { jobId, error: errorMessage });
+    logger.error('ProcessVideo', 'Job failed', {
+      jobId,
+      error: errorMessage,
+      failureStats: failureTracker.getStats(),
+    });
     setError(jobId, errorMessage);
   }
 }

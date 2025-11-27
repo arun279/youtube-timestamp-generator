@@ -14,6 +14,7 @@ import { z } from 'zod';
  * - high: 256 tokens/frame (same as medium for Gemini 2.5)
  *
  * Plus audio: 32 tokens/second always
+ * @public Used for Zod validation and type inference
  */
 export const MediaResolutionSchema = z.enum(['low', 'medium', 'high']);
 export type MediaResolutionType = z.infer<typeof MediaResolutionSchema>;
@@ -38,7 +39,7 @@ export type ProcessingConfig = z.infer<typeof ProcessingConfigSchema>;
 // Gemini API Types
 // ============================================================================
 
-export const ChunkEventSchema = z.object({
+const ChunkEventSchema = z.object({
   timestamp: z.string().describe('HH:MM:SS format'),
   type: z.enum([
     'Main Topic',
@@ -58,8 +59,6 @@ export const ChunkEventSchema = z.object({
   speaker: z.string().optional().describe('Name of speaker if identifiable'),
 });
 
-export type ChunkEvent = z.infer<typeof ChunkEventSchema>;
-
 export const ChunkAnalysisSchema = z.object({
   chunk_summary: z.string().describe('Concise summary of the video segment'),
   events: z.array(ChunkEventSchema),
@@ -73,6 +72,7 @@ export type ChunkAnalysis = z.infer<typeof ChunkAnalysisSchema>;
 
 export type JobStatus = 'pending' | 'processing' | 'consolidating' | 'completed' | 'failed';
 
+/** @public Valid chunk processing states */
 export type ChunkStatus = 'pending' | 'processing' | 'completed' | 'error' | 'retrying';
 
 export interface ChunkMetadata {
@@ -132,13 +132,18 @@ export interface JobCreationResult {
 // SSE Event Types
 // ============================================================================
 
+/**
+ * @public SSE event types - documents the Server-Sent Events protocol
+ */
 export type SSEEventType = 'job:status' | 'chunk:update' | 'concurrency:change' | 'log' | 'error';
 
+/** @public Base SSE event shape */
 export interface SSEEvent {
   type: SSEEventType;
   data: unknown;
 }
 
+/** @public Job status update event */
 export interface JobStatusEvent {
   type: 'job:status';
   data: {
@@ -151,6 +156,7 @@ export interface JobStatusEvent {
   };
 }
 
+/** @public Chunk processing update event */
 export interface ChunkUpdateEvent {
   type: 'chunk:update';
   data: {
@@ -162,6 +168,7 @@ export interface ChunkUpdateEvent {
   };
 }
 
+/** @public Concurrency change notification */
 export interface ConcurrencyChangeEvent {
   type: 'concurrency:change';
   data: {
@@ -171,6 +178,7 @@ export interface ConcurrencyChangeEvent {
   };
 }
 
+/** @public Log entry event */
 export interface LogEvent {
   type: 'log';
   data: JobLogEntry;
@@ -186,26 +194,4 @@ export interface StoredApiKey {
   tier: Tier;
   models: string[];
   expiresAt?: string; // ISO 8601
-}
-
-export interface CustomPrompt {
-  content: string;
-  modifiedAt: string; // ISO 8601
-}
-
-export interface StorageSchema {
-  apiKey?: StoredApiKey;
-  customPrompts?: Record<string, CustomPrompt>; // keyed by `${apiKeyHash}_${promptType}`
-}
-
-// ============================================================================
-// Utility Types
-// ============================================================================
-
-export interface TokenCalculation {
-  tokensPerSecond: number;
-  tokensPerChunk: number;
-  chunksPerMinute: number;
-  withinLimit: boolean;
-  warningMessage?: string;
 }
