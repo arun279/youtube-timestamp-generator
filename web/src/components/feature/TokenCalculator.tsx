@@ -17,12 +17,12 @@ import { calculateTokens } from '@/lib/utils';
 import type { MediaResolutionType } from '@/types';
 
 interface TokenCalculatorProps {
-  duration: number; // seconds
-  chunkSize: number; // minutes
-  fps: number;
-  resolution: MediaResolutionType;
-  model: string;
-  tier: Tier;
+  readonly duration: number; // seconds
+  readonly chunkSize: number; // minutes
+  readonly fps: number;
+  readonly resolution: MediaResolutionType;
+  readonly model: string;
+  readonly tier: Tier;
 }
 
 export function TokenCalculator({
@@ -95,36 +95,45 @@ export function TokenCalculator({
     };
   }, [duration, chunkSize, fps, resolution, model, tier]);
 
+  // Determine status variant for consistent styling
+  const getStatusVariant = () => {
+    if (stats.chunkExceedsLimit) return 'error';
+    if (stats.withinLimit) return 'success';
+    return 'warning';
+  };
+
+  const variant = getStatusVariant();
+
+  const variantStyles = {
+    error: {
+      card: 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950',
+      icon: <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />,
+      label: '❌ Chunk Exceeds Rate Limit',
+    },
+    success: {
+      card: 'border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950',
+      icon: <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />,
+      label: '✓ Configuration OK',
+    },
+    warning: {
+      card: 'border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950',
+      icon: <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600" />,
+      label: '⚠️ High Token Usage',
+    },
+  } as const;
+
+  const currentVariant = variantStyles[variant];
+
   return (
-    <Card
-      className={
-        stats.chunkExceedsLimit
-          ? 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950'
-          : stats.withinLimit
-            ? 'border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950'
-            : 'border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950'
-      }
-    >
+    <Card className={currentVariant.card}>
       <CardContent className="pt-4">
         <div className="flex items-start gap-3">
-          {stats.chunkExceedsLimit ? (
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-          ) : stats.withinLimit ? (
-            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />
-          ) : (
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600" />
-          )}
+          {currentVariant.icon}
 
           <div className="flex-1 space-y-3">
             {/* Status Header */}
             <div className="flex items-baseline gap-2">
-              <span className="text-sm font-semibold">
-                {stats.chunkExceedsLimit
-                  ? '❌ Chunk Exceeds Rate Limit'
-                  : stats.withinLimit
-                    ? '✓ Configuration OK'
-                    : '⚠️ High Token Usage'}
-              </span>
+              <span className="text-sm font-semibold">{currentVariant.label}</span>
             </div>
 
             {/* Main Stats Grid */}

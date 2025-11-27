@@ -125,7 +125,9 @@ export class AdaptiveRateLimiter {
       await this.acquireInternal(estimatedTokens, requestId);
     });
 
-    this.acquireChain = acquisition.catch(() => {});
+    // Chain continuation pattern: errors propagate via returned `acquisition` promise,
+    // empty catch prevents unhandled rejection on internal chain reference
+    this.acquireChain = acquisition.catch(() => undefined);
     return acquisition;
   }
 

@@ -34,8 +34,8 @@ function toMediaResolution(resolution: MediaResolutionType): MediaResolution {
  * Create a Gemini client instance (internal use only)
  */
 function createGeminiClient(apiKey: string): GoogleGenAI {
-  if (typeof window !== 'undefined') {
-    throw new Error('createGeminiClient() can only be called server-side');
+  if (globalThis.window !== undefined) {
+    throw new TypeError('createGeminiClient() can only be called server-side');
   }
 
   return new GoogleGenAI({ apiKey });
@@ -55,6 +55,21 @@ export interface AnalyzeChunkResult {
 }
 
 /**
+ * Options for chunk processing functions
+ * @public Shared options for countChunkTokens and analyzeChunk
+ */
+export interface ChunkProcessingOptions {
+  readonly apiKey: string;
+  readonly videoUrl: string;
+  readonly startOffset: string;
+  readonly endOffset: string;
+  readonly prompt: string;
+  readonly fps: number;
+  readonly resolution: MediaResolutionType;
+  readonly model?: string;
+}
+
+/**
  * Estimate tokens for a video chunk
  *
  * NOTE: We use formula-based estimation because the countTokens API:
@@ -66,19 +81,12 @@ export interface AnalyzeChunkResult {
  * The formula is based on official Gemini documentation:
  * https://ai.google.dev/gemini-api/docs/media-resolution
  */
-export async function countChunkTokens(
-  _apiKey: string,
-  _videoUrl: string,
-  startOffset: string,
-  endOffset: string,
-  _prompt: string,
-  fps: number,
-  resolution: MediaResolutionType,
-  _model: string = 'gemini-2.5-flash'
-): Promise<number> {
+export async function countChunkTokens(options: ChunkProcessingOptions): Promise<number> {
+  const { startOffset, endOffset, fps, resolution } = options;
   // Formula-based estimation using official token rates
   const durationSeconds =
-    parseInt(endOffset.replace('s', '')) - parseInt(startOffset.replace('s', ''));
+    Number.parseInt(endOffset.replace('s', ''), 10) -
+    Number.parseInt(startOffset.replace('s', ''), 10);
   const tokensPerFrame = resolution === 'low' ? 64 : 256;
   const audioTokensPerSecond = 32;
   const estimatedTokens = Math.ceil(
@@ -102,24 +110,26 @@ export async function countChunkTokens(
  * Uses Structured Output for reliable JSON parsing
  * Returns both the analysis and usage metadata for rate limiter updates
  */
-export async function analyzeChunk(
-  apiKey: string,
-  videoUrl: string,
-  startOffset: string,
-  endOffset: string,
-  prompt: string,
-  fps: number,
-  resolution: MediaResolutionType,
-  model: string = 'gemini-2.5-flash'
-): Promise<AnalyzeChunkResult> {
+export async function analyzeChunk(options: ChunkProcessingOptions): Promise<AnalyzeChunkResult> {
+  const {
+    apiKey,
+    videoUrl,
+    startOffset,
+    endOffset,
+    prompt,
+    fps,
+    resolution,
+    model = 'gemini-2.5-flash',
+  } = options;
+
   const ai = createGeminiClient(apiKey);
 
   // Parse chunk start offset to inject into prompt
-  const startOffsetSeconds = parseInt(startOffset.replace('s', ''));
+  const startOffsetSeconds = Number.parseInt(startOffset.replace('s', ''), 10);
 
   // Inject chunk start offset into prompt template
-  const contextualizedPrompt = prompt.replace(
-    /{{CHUNK_START_OFFSET}}/g,
+  const contextualizedPrompt = prompt.replaceAll(
+    '{{CHUNK_START_OFFSET}}',
     startOffsetSeconds.toString()
   );
 
@@ -380,9 +390,23 @@ export async function listModels(apiKey: string): Promise<string[]> {
     // If successful, return common model names
     return ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-pro'];
   } catch (error) {
-    throw new Error(`Failed to validate API key: ${error}`);
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to validate API key: ${message}`);
   }
 }
+
+/** Tier detection configuration */
+const TIER_DETECTION = {
+  /** Number of probe requests to send */
+  probeCount: 3,
+  /** Response time threshold (ms) - faster indicates paid tier */
+  paidTierThresholdMs: 500,
+  /** Default tier limits */
+  tiers: {
+    free: { tier: 'free' as const, tpm: 250_000, rpm: 10 },
+    tier1: { tier: 'tier1' as const, tpm: 1_000_000, rpm: 1_000 },
+  },
+} as const;
 
 /**
  * Detect user tier by sending probe requests
@@ -394,34 +418,33 @@ export async function detectTier(
   const ai = createGeminiClient(apiKey);
 
   try {
-    // Send 3 rapid test requests to check rate limits
-    const probes = Array(3)
-      .fill(null)
-      .map(async () => {
-        const start = Date.now();
-        await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: 'test',
-        });
-        return Date.now() - start;
+    // Send rapid test requests to check rate limits
+    const measureRequestTime = async (): Promise<number> => {
+      const start = Date.now();
+      await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: 'test',
       });
+      return Date.now() - start;
+    };
 
+    const probes = Array.from({ length: TIER_DETECTION.probeCount }, measureRequestTime);
     const times = await Promise.all(probes);
     const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
 
     // If all requests succeed quickly, likely paid tier
-    if (avgTime < 500) {
-      return { tier: 'tier1', tpm: 1_000_000, rpm: 1_000 };
+    if (avgTime < TIER_DETECTION.paidTierThresholdMs) {
+      return TIER_DETECTION.tiers.tier1;
     }
 
-    return { tier: 'free', tpm: 250_000, rpm: 10 };
+    return TIER_DETECTION.tiers.free;
   } catch (error: unknown) {
-    // Check if it's a rate limit error
+    // Check if it's a rate limit error (429)
     if (error instanceof Error && error.message.includes('429')) {
-      return { tier: 'free', tpm: 250_000, rpm: 10 };
+      return TIER_DETECTION.tiers.free;
     }
 
     // Unknown error - default to free tier to be safe
-    return { tier: 'free', tpm: 250_000, rpm: 10 };
+    return TIER_DETECTION.tiers.free;
   }
 }
