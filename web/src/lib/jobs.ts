@@ -10,7 +10,8 @@
  * shared instance across all runtime contexts.
  */
 
-import type { Job, JobStatus, ChunkMetadata, JobLogEntry, ProcessingConfig } from '@/types';
+import type { ChunkMetadata, Job, JobLogEntry, JobStatus, ProcessingConfig } from '@/types';
+
 import { JOB_CONFIG } from './constants';
 import { logger } from './logger';
 

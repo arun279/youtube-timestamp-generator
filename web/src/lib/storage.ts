@@ -3,9 +3,10 @@
  * Supports both sessionStorage (ephemeral) and localStorage (persistent)
  */
 
-import { hashString } from './utils';
-import { STORAGE_KEYS } from './constants';
 import type { StoredApiKey } from '@/types';
+
+import { STORAGE_KEYS } from './constants';
+import { hashString } from './utils';
 
 // ============================================================================
 // API Key Storage

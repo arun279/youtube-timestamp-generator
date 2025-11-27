@@ -7,12 +7,11 @@
  * Token rates are based on official Gemini API documentation:
  * https://ai.google.dev/gemini-api/docs/media-resolution
  */
-
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
+import { Slider } from '@/components/ui/slider';
 import { TOKEN_CONSTANTS } from '@/lib/constants';
-import type { ApiKeyValidationResult, ProcessingConfig, MediaResolutionType } from '@/types';
+import type { ApiKeyValidationResult, MediaResolutionType, ProcessingConfig } from '@/types';
 
 interface AdvancedSettingsProps {
   config: Partial<ProcessingConfig>;

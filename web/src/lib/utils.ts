@@ -1,7 +1,9 @@
-import { type ClassValue, clsx } from 'clsx';
+import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { TOKEN_CONSTANTS } from './constants';
+
 import type { MediaResolutionType } from '@/types';
+
+import { TOKEN_CONSTANTS } from './constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -78,7 +80,7 @@ export function extractYouTubeId(url: string): string | null {
   ];
 
   for (const pattern of patterns) {
-    const match = url.match(pattern);
+    const match = pattern.exec(url);
     if (match?.[1]) return match[1];
   }
 

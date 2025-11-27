@@ -25,7 +25,7 @@ export type Tier = z.infer<typeof Tier>;
 export const ProcessingConfigSchema = z.object({
   videoUrl: z.string().url(),
   chunkSize: z.number().min(5).max(60).default(15), // minutes (reduced default for safety)
-  fps: z.number().min(0.2).max(2.0).default(0.5),
+  fps: z.number().min(0.2).max(2).default(0.5),
   resolution: MediaResolutionSchema.default('low'),
   model: z.string().default('gemini-2.5-flash'),
   tier: Tier.default('free'),

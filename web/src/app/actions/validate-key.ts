@@ -4,8 +4,7 @@
  * Server Action: Validate Gemini API key
  * Checks if key is valid and detects tier
  */
-
-import { listModels, detectTier } from '@/lib/gemini';
+import { detectTier, listModels } from '@/lib/gemini';
 import { validateApiKeyFormat } from '@/lib/utils';
 import type { ApiKeyValidationResult } from '@/types';
 

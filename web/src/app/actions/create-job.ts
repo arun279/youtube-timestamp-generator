@@ -4,13 +4,12 @@
  * Server Action: Create a processing job
  * Validates input, creates job, triggers background processing
  */
+import { v4 as uuidv4 } from 'uuid';
 
 import { createJob, initializeJobCleanup } from '@/lib/jobs';
-import { generateChunks } from '@/lib/utils';
 import { logger } from '@/lib/logger';
-import { ProcessingConfigSchema } from '@/types';
-import type { JobCreationResult } from '@/types';
-import { v4 as uuidv4 } from 'uuid';
+import { generateChunks } from '@/lib/utils';
+import { ProcessingConfigSchema, type JobCreationResult } from '@/types';
 
 // Initialize cleanup on module load
 initializeJobCleanup();

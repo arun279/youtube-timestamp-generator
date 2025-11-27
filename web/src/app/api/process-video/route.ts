@@ -4,9 +4,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+
 import { getJob } from '@/lib/jobs';
-import { processVideoInBackground } from '@/lib/process-video';
 import { logger } from '@/lib/logger';
+import { processVideoInBackground } from '@/lib/process-video';
 
 export async function POST(request: NextRequest) {
   try {

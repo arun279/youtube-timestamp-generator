@@ -3,7 +3,8 @@
  * Loads the API dynamically and creates a headless player
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { extractYouTubeId } from '@/lib/utils';
 
 declare global {

@@ -9,8 +9,9 @@
  */
 
 import { GoogleGenAI, MediaResolution, Type } from '@google/genai';
-import type { ChunkAnalysis, MediaResolutionType } from '@/types';
-import { ChunkAnalysisSchema } from '@/types';
+
+import { ChunkAnalysisSchema, type ChunkAnalysis, type MediaResolutionType } from '@/types';
+
 import { logger } from './logger';
 
 /**

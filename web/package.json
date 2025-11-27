@@ -18,7 +18,7 @@
     "circular": "madge --circular --extensions ts,tsx src/",
     "analyze": "ANALYZE=true npm run build",
     "deadcode": "npx knip",
-    "quality": "npm run typecheck && npm run lint && npm run circular && npm run deadcode"
+    "quality": "npm run typecheck && npm run lint && npm run format:check && npm run circular && npm run deadcode"
   },
   "dependencies": {
     "@google/genai": "^1.0.0",
@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
+    "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@next/bundle-analyzer": "^16.0.5",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.1",

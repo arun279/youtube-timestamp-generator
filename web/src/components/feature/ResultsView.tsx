@@ -4,11 +4,11 @@
  * Results View Component
  * Displays final consolidated timestamps
  */
-
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle2, Copy, Download, Loader2, RotateCcw } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Copy, Download, RotateCcw, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import type { Job } from '@/types';
 

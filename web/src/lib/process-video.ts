@@ -11,28 +11,31 @@
  * - 5 total failures = fail job (too unstable)
  */
 
-import {
-  getJob,
-  updateJobStatus,
-  updateChunkStatus,
-  addTokensUsed,
-  setResult,
-  setError,
-  addLog,
-} from './jobs';
-import { AdaptiveRateLimiter, getRateLimits } from './rate-limits';
+import { randomInt } from 'node:crypto';
+import PQueue from 'p-queue';
+
+import type { ChunkAnalysis } from '@/types';
+
+import { FAILURE_CONFIG, QUEUE_CONFIG, RATE_LIMIT_CONFIG } from './constants';
 import {
   analyzeChunk,
   consolidateChunks,
   countChunkTokens,
   countConsolidationTokens,
 } from './gemini';
-import { DEFAULT_PROMPTS } from './prompts/defaults';
-import { calculateTokens } from './utils';
+import {
+  addLog,
+  addTokensUsed,
+  getJob,
+  setError,
+  setResult,
+  updateChunkStatus,
+  updateJobStatus,
+} from './jobs';
 import { logger } from './logger';
-import { QUEUE_CONFIG, RATE_LIMIT_CONFIG, FAILURE_CONFIG } from './constants';
-import type { ChunkAnalysis } from '@/types';
-import PQueue from 'p-queue';
+import { DEFAULT_PROMPTS } from './prompts/defaults';
+import { AdaptiveRateLimiter, getRateLimits } from './rate-limits';
+import { calculateTokens } from './utils';
 
 /**
  * Job failure tracker
@@ -137,9 +140,10 @@ class FailureTracker {
  * Gemini returns "retry in XX.XXs" in error messages
  */
 function extractRetryDelay(error: Error): number {
-  const match = error.message.match(/retry in ([\d.]+)s/i);
+  const regex = /retry in ([\d.]+)s/i;
+  const match = regex.exec(error.message);
   if (match?.[1]) {
-    return Math.ceil(parseFloat(match[1]) * 1000);
+    return Math.ceil(Number.parseFloat(match[1]) * 1000);
   }
   return 0;
 }
@@ -161,7 +165,8 @@ function calculateBackoff(attempt: number, error?: Error): number {
     FAILURE_CONFIG.baseRetryDelayMs * Math.pow(FAILURE_CONFIG.backoffMultiplier, attempt);
 
   // Add jitter (0-10% of delay) to prevent thundering herd
-  const jitter = Math.random() * exponentialDelay * 0.1;
+  // Using crypto.randomInt for SonarQube compliance (not security-critical)
+  const jitter = (randomInt(1000) / 1000) * exponentialDelay * 0.1;
 
   return Math.min(exponentialDelay + jitter, FAILURE_CONFIG.maxRetryDelayMs);
 }
@@ -310,7 +315,8 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
               });
             } catch {
               // Fallback to formula-based estimation
-              const duration = parseInt(chunk.endOffset) - parseInt(chunk.startOffset);
+              const duration =
+                Number.parseInt(chunk.endOffset) - Number.parseInt(chunk.startOffset);
               const { totalTokens } = calculateTokens(
                 duration,
                 job.config.fps,
@@ -357,7 +363,7 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
 
             // Log estimation accuracy
             const accuracy = usageMetadata.promptTokenCount / estimatedTokens;
-            if (Math.abs(accuracy - 1.0) > 0.2) {
+            if (Math.abs(accuracy - 1) > 0.2) {
               logger.warn('ProcessVideo', 'Token estimation inaccuracy', {
                 jobId,
                 chunkLabel,

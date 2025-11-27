@@ -7,13 +7,13 @@
  * Uses official Gemini API token rates:
  * https://ai.google.dev/gemini-api/docs/media-resolution
  */
-
 import { useMemo } from 'react';
+import { AlertTriangle, CheckCircle2, Clock, Info, Zap } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui/card';
-import { AlertTriangle, CheckCircle2, Clock, Zap, Info } from 'lucide-react';
-import { calculateTokens } from '@/lib/utils';
-import { TOKEN_CONSTANTS, RATE_LIMIT_CONFIG } from '@/lib/constants';
+import { RATE_LIMIT_CONFIG, TOKEN_CONSTANTS } from '@/lib/constants';
 import { getRateLimits, type Tier } from '@/lib/rate-limits';
+import { calculateTokens } from '@/lib/utils';
 import type { MediaResolutionType } from '@/types';
 
 interface TokenCalculatorProps {
