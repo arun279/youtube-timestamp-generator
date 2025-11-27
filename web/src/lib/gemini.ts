@@ -30,9 +30,9 @@ function toMediaResolution(resolution: MediaResolutionType): MediaResolution {
 }
 
 /**
- * Create a Gemini client instance
+ * Create a Gemini client instance (internal use only)
  */
-export function createGeminiClient(apiKey: string): GoogleGenAI {
+function createGeminiClient(apiKey: string): GoogleGenAI {
   if (typeof window !== 'undefined') {
     throw new Error('createGeminiClient() can only be called server-side');
   }
@@ -42,6 +42,7 @@ export function createGeminiClient(apiKey: string): GoogleGenAI {
 
 /**
  * Result of analyzeChunk including usage metadata for rate limiter
+ * @public Return type of analyzeChunk function
  */
 export interface AnalyzeChunkResult {
   analysis: ChunkAnalysis;
@@ -253,6 +254,7 @@ export async function analyzeChunk(
 
 /**
  * Result of consolidateChunks including usage metadata
+ * @public Return type of consolidateChunks function
  */
 export interface ConsolidateResult {
   text: string;

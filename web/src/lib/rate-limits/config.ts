@@ -9,6 +9,7 @@
 
 import { logger } from '../logger';
 
+/** @public Return type of getRateLimits function */
 export interface ModelLimits {
   rpm: number; // Requests per minute
   tpm: number; // Tokens per minute
@@ -17,7 +18,8 @@ export interface ModelLimits {
 
 export type Tier = 'free' | 'tier1' | 'tier2' | 'tier3';
 
-export interface RateLimitConfig {
+// Internal type for RATE_LIMITS constant
+interface RateLimitConfig {
   [modelName: string]: {
     [tier in Tier]: ModelLimits;
   };
@@ -27,7 +29,7 @@ export interface RateLimitConfig {
  * Rate limits from Gemini API documentation
  * Last updated: 2025-11-26
  */
-export const RATE_LIMITS: RateLimitConfig = {
+const RATE_LIMITS: RateLimitConfig = {
   'gemini-2.5-flash': {
     free: { rpm: 10, tpm: 250_000, rpd: 250 },
     tier1: { rpm: 1_000, tpm: 1_000_000, rpd: 10_000 },
@@ -56,52 +58,6 @@ export const RATE_LIMITS: RateLimitConfig = {
 };
 
 /**
- * Default safety buffer to add to token estimates (10%)
- * This inflates estimated tokens before checking against TPM limit
- */
-export const DEFAULT_TOKEN_SAFETY_BUFFER = 0.1;
-
-/**
- * @deprecated Use DEFAULT_TOKEN_SAFETY_BUFFER instead
- */
-export const DEFAULT_SAFETY_BUFFER = DEFAULT_TOKEN_SAFETY_BUFFER;
-
-/**
- * Buffer configuration for rate limits
- * These reduce the effective limits to provide safety margin
- */
-export interface BufferConfig {
-  /** TPM buffer as percentage (0.1 = 10% reduction) */
-  tpmBufferPercent: number;
-  /** RPM buffer as absolute count (1 = reduce limit by 1) */
-  rpmBufferCount: number;
-}
-
-/**
- * Default buffer configuration
- * - TPM: 10% buffer (250K -> 225K effective)
- * - RPM: 1 request buffer (10 -> 9 effective)
- */
-export const DEFAULT_BUFFER_CONFIG: BufferConfig = {
-  tpmBufferPercent: 0.1,
-  rpmBufferCount: 1,
-};
-
-/**
- * Calculate effective limits after applying buffers
- */
-export function getEffectiveLimits(
-  limits: ModelLimits,
-  bufferConfig: BufferConfig = DEFAULT_BUFFER_CONFIG
-): ModelLimits {
-  return {
-    rpm: Math.max(limits.rpm - bufferConfig.rpmBufferCount, 1),
-    tpm: Math.floor(limits.tpm * (1 - bufferConfig.tpmBufferPercent)),
-    rpd: limits.rpd,
-  };
-}
-
-/**
  * Get rate limits for a specific model and tier
  */
 export function getRateLimits(model: string, tier: Tier = 'free'): ModelLimits {
@@ -112,18 +68,16 @@ export function getRateLimits(model: string, tier: Tier = 'free'): ModelLimits {
       model,
       tier,
     });
-    return RATE_LIMITS['gemini-2.5-flash'][tier];
+    const fallback = RATE_LIMITS['gemini-2.5-flash']?.[tier];
+    if (!fallback) {
+      throw new Error(`No rate limits found for fallback model gemini-2.5-flash tier ${tier}`);
+    }
+    return fallback;
   }
 
-  return modelLimits[tier];
-}
-
-/**
- * Calculate token estimate with safety buffer
- */
-export function applyTokenSafetyBuffer(
-  estimatedTokens: number,
-  buffer: number = DEFAULT_TOKEN_SAFETY_BUFFER
-): number {
-  return Math.ceil(estimatedTokens * (1 + buffer));
+  const limits = modelLimits[tier];
+  if (!limits) {
+    throw new Error(`No rate limits found for model ${model} tier ${tier}`);
+  }
+  return limits;
 }

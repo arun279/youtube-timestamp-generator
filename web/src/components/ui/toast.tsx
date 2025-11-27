@@ -109,6 +109,7 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>;
 
+/** @public ToastAction exported for actionable toasts */
 export {
   type ToastProps,
   type ToastActionElement,

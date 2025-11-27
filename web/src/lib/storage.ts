@@ -5,7 +5,7 @@
 
 import { hashString } from './utils';
 import { STORAGE_KEYS } from './constants';
-import type { StoredApiKey, CustomPrompt } from '@/types';
+import type { StoredApiKey } from '@/types';
 
 // ============================================================================
 // API Key Storage
@@ -96,89 +96,5 @@ export const ApiKeyStorage = {
   },
 };
 
-// ============================================================================
-// Custom Prompt Storage
-// ============================================================================
-
-export const PromptStorage = {
-  /**
-   * Save custom prompt
-   * @param promptType - 'chunkAnalysis' or 'consolidation'
-   * @param content - The custom prompt content
-   * @param apiKeyHash - Hash of the API key (for multi-user support)
-   */
-  save(promptType: string, content: string, apiKeyHash: string): void {
-    const key = `${apiKeyHash}_${promptType}`;
-    const allPrompts = this.getAll();
-
-    allPrompts[key] = {
-      content,
-      modifiedAt: new Date().toISOString(),
-    };
-
-    localStorage.setItem(STORAGE_KEYS.customPrompts, JSON.stringify(allPrompts));
-  },
-
-  /**
-   * Get custom prompt
-   */
-  get(promptType: string, apiKeyHash: string): CustomPrompt | null {
-    const key = `${apiKeyHash}_${promptType}`;
-    const allPrompts = this.getAll();
-    return allPrompts[key] ?? null;
-  },
-
-  /**
-   * Get all custom prompts
-   */
-  getAll(): Record<string, CustomPrompt> {
-    const data = localStorage.getItem(STORAGE_KEYS.customPrompts);
-    if (!data) return {};
-
-    try {
-      return JSON.parse(data);
-    } catch {
-      return {};
-    }
-  },
-
-  /**
-   * Delete a custom prompt (revert to default)
-   */
-  delete(promptType: string, apiKeyHash: string): void {
-    const key = `${apiKeyHash}_${promptType}`;
-    const allPrompts = this.getAll();
-    delete allPrompts[key];
-    localStorage.setItem(STORAGE_KEYS.customPrompts, JSON.stringify(allPrompts));
-  },
-
-  /**
-   * Check if custom prompt exists
-   */
-  exists(promptType: string, apiKeyHash: string): boolean {
-    return this.get(promptType, apiKeyHash) !== null;
-  },
-
-  /**
-   * Clear all custom prompts
-   */
-  clearAll(): void {
-    localStorage.removeItem(STORAGE_KEYS.customPrompts);
-  },
-};
-
-// ============================================================================
-// Environment Variable Access (Server-side)
-// ============================================================================
-
-/**
- * Get API key from environment (server-side only)
- * Used for self-hosting with a shared key
- */
-export function getServerApiKey(): string | undefined {
-  // Only accessible server-side
-  if (typeof window !== 'undefined') {
-    throw new Error('getServerApiKey() can only be called server-side');
-  }
-  return process.env.GEMINI_API_KEY;
-}
+// NOTE: Custom prompt storage and server API key features removed
+// as they were never implemented. See git history if needed.

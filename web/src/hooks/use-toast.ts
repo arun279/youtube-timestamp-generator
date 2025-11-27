@@ -59,6 +59,7 @@ const addToRemoveQueue = (toastId: string) => {
   toastTimeouts.set(toastId, timeout);
 };
 
+/** @public Exported for advanced toast state management */
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'ADD_TOAST':
@@ -172,4 +173,5 @@ function useToast() {
   };
 }
 
+/** @public toast exported for programmatic toasts, reducer for advanced state management */
 export { useToast, toast };

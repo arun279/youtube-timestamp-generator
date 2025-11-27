@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Simple Logger Utility
  *
@@ -104,5 +105,3 @@ export const logger = {
     }
   },
 };
-
-export default logger;
