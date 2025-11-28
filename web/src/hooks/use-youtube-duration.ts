@@ -3,19 +3,23 @@
  * Loads the API dynamically and creates a headless player
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { extractYouTubeId } from '@/lib/utils';
 
 declare global {
   interface Window {
     YT: {
-      Player: new (elementId: string, config: {
-        videoId: string;
-        events: {
-          onReady: (event: { target: YTPlayer }) => void;
-          onError: (event: { data: number }) => void;
-        };
-      }) => YTPlayer;
+      Player: new (
+        elementId: string,
+        config: {
+          videoId: string;
+          events: {
+            onReady: (event: { target: YTPlayer }) => void;
+            onError: (event: { data: number }) => void;
+          };
+        }
+      ) => YTPlayer;
       PlayerState: {
         ENDED: number;
         PLAYING: number;
@@ -56,12 +60,12 @@ function loadYouTubeAPI(): Promise<void> {
     // Create script tag
     const tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
-    
+
     // Set up callback
     window.onYouTubeIframeAPIReady = () => {
       apiLoaded = true;
       apiLoading = false;
-      apiLoadCallbacks.forEach(cb => cb());
+      apiLoadCallbacks.forEach((cb) => cb());
       apiLoadCallbacks.length = 0;
     };
 
@@ -115,11 +119,11 @@ export function useYouTubeDuration(url: string | null) {
           events: {
             onReady: (event) => {
               if (!mounted) return;
-              
+
               try {
                 const videoDuration = event.target.getDuration();
                 const videoData = event.target.getVideoData();
-                
+
                 setDuration(videoDuration);
                 setTitle(videoData.title);
                 setLoading(false);
@@ -130,7 +134,7 @@ export function useYouTubeDuration(url: string | null) {
             },
             onError: (event) => {
               if (!mounted) return;
-              
+
               const errorMessages: Record<number, string> = {
                 2: 'Invalid video ID',
                 5: 'HTML5 player error',
@@ -138,7 +142,7 @@ export function useYouTubeDuration(url: string | null) {
                 101: 'Video not available',
                 150: 'Video not available',
               };
-              
+
               setError(errorMessages[event.data] || 'Failed to load video');
               setLoading(false);
             },
@@ -168,4 +172,3 @@ export function useYouTubeDuration(url: string | null) {
 
   return { duration, title, loading, error };
 }
-

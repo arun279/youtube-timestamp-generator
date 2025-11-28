@@ -8,14 +8,16 @@
  * 3. Processing visualization
  * 4. Results display
  */
+import { useEffect, useState } from 'react';
 
-import { useState, useEffect } from 'react';
+import { getRateLimits } from '@/lib/rate-limits';
+import { ApiKeyStorage } from '@/lib/storage';
+import type { ApiKeyValidationResult } from '@/types';
+
 import { ApiKeyOnboarding } from './ApiKeyOnboarding';
 import { InputSection } from './InputSection';
 import { ProcessingView } from './ProcessingView';
 import { ResultsView } from './ResultsView';
-import { ApiKeyStorage } from '@/lib/storage';
-import type { ApiKeyValidationResult } from '@/types';
 
 type AppState = 'onboarding' | 'ready' | 'processing' | 'completed';
 
@@ -28,12 +30,15 @@ export function MainApp() {
   useEffect(() => {
     const stored = ApiKeyStorage.get();
     if (stored) {
+      // Get rate limits for the stored tier (default to gemini-2.5-flash)
+      const limits = getRateLimits('gemini-2.5-flash', stored.tier);
+
       setApiKeyInfo({
         isValid: true,
         tier: stored.tier,
         models: stored.models,
-        tpm: stored.tier === 'paid' ? 4_000_000 : 250_000,
-        rpm: stored.tier === 'paid' ? 360 : 15,
+        tpm: limits.tpm,
+        rpm: limits.rpm,
       });
       setState('ready');
     }
@@ -66,43 +71,27 @@ export function MainApp() {
   if (state === 'ready') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-        <div className="max-w-4xl mx-auto space-y-6 py-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-4xl font-bold tracking-tight">
-              YouTube Timestamp Generator
-            </h1>
+        <div className="mx-auto max-w-4xl space-y-6 py-8">
+          <div className="space-y-2 text-center">
+            <h1 className="text-4xl font-bold tracking-tight">YouTube Timestamp Generator</h1>
             <p className="text-muted-foreground">
               AI-powered timestamp generation using Gemini 2.5 Flash
             </p>
           </div>
-          
-          <InputSection
-            apiKeyInfo={apiKeyInfo!}
-            onStart={handleProcessingStarted}
-          />
+
+          <InputSection apiKeyInfo={apiKeyInfo!} onStart={handleProcessingStarted} />
         </div>
       </div>
     );
   }
 
   if (state === 'processing' && jobId) {
-    return (
-      <ProcessingView
-        jobId={jobId}
-        onComplete={handleProcessingComplete}
-      />
-    );
+    return <ProcessingView jobId={jobId} onComplete={handleProcessingComplete} />;
   }
 
   if (state === 'completed' && jobId) {
-    return (
-      <ResultsView
-        jobId={jobId}
-        onStartNew={handleStartNew}
-      />
-    );
+    return <ResultsView jobId={jobId} onStartNew={handleStartNew} />;
   }
 
   return null;
 }
-

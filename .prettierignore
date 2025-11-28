@@ -1,0 +1,9 @@
+node_modules/
+.next/
+dist/
+build/
+*.log
+package-lock.json
+web/src/lib/constants.ts
+Dockerfile
+prompts/

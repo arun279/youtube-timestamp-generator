@@ -4,17 +4,35 @@ import { z } from 'zod';
 // Configuration Types
 // ============================================================================
 
-export const MediaResolution = z.enum(['low', 'default']);
-export type MediaResolution = z.infer<typeof MediaResolution>;
+/**
+ * Media resolution options for video processing
+ * Based on Gemini API MediaResolution enum
+ *
+ * Token counts per frame (Gemini 2.5):
+ * - low: 64 tokens/frame
+ * - medium: 256 tokens/frame
+ * - high: 256 tokens/frame (same as medium for Gemini 2.5)
+ *
+ * Plus audio: 32 tokens/second always
+ * @public Used for Zod validation and type inference
+ */
+export const MediaResolutionSchema = z.enum(['low', 'medium', 'high']);
+export type MediaResolutionType = z.infer<typeof MediaResolutionSchema>;
+
+export const Tier = z.enum(['free', 'tier1', 'tier2', 'tier3']);
+export type Tier = z.infer<typeof Tier>;
 
 export const ProcessingConfigSchema = z.object({
   videoUrl: z.string().url(),
-  chunkSize: z.number().min(5).max(60).default(25), // minutes
-  fps: z.number().min(0.2).max(2.0).default(0.5),
-  resolution: MediaResolution.default('low'),
-  model: z.string().default('gemini-2.0-flash-exp'),
+  chunkSize: z.number().min(5).max(60).default(15), // minutes (reduced default for safety)
+  fps: z.number().min(0.2).max(2).default(0.5),
+  resolution: MediaResolutionSchema.default('low'),
+  model: z.string().default('gemini-2.5-flash'),
+  tier: Tier.default('free'),
   concurrencyMode: z.enum(['adaptive', 'manual']).default('adaptive'),
   manualConcurrency: z.number().min(1).max(10).optional(),
+  /** Prompt pair ID - uses default if not specified */
+  promptId: z.string().optional(),
 });
 
 export type ProcessingConfig = z.infer<typeof ProcessingConfigSchema>;
@@ -23,7 +41,7 @@ export type ProcessingConfig = z.infer<typeof ProcessingConfigSchema>;
 // Gemini API Types
 // ============================================================================
 
-export const ChunkEventSchema = z.object({
+const ChunkEventSchema = z.object({
   timestamp: z.string().describe('HH:MM:SS format'),
   type: z.enum([
     'Main Topic',
@@ -43,8 +61,6 @@ export const ChunkEventSchema = z.object({
   speaker: z.string().optional().describe('Name of speaker if identifiable'),
 });
 
-export type ChunkEvent = z.infer<typeof ChunkEventSchema>;
-
 export const ChunkAnalysisSchema = z.object({
   chunk_summary: z.string().describe('Concise summary of the video segment'),
   events: z.array(ChunkEventSchema),
@@ -56,24 +72,15 @@ export type ChunkAnalysis = z.infer<typeof ChunkAnalysisSchema>;
 // Job Management Types
 // ============================================================================
 
-export type JobStatus = 
-  | 'pending'
-  | 'processing'
-  | 'consolidating'
-  | 'completed'
-  | 'failed';
+export type JobStatus = 'pending' | 'processing' | 'consolidating' | 'completed' | 'failed';
 
-export type ChunkStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'error'
-  | 'retrying';
+/** @public Valid chunk processing states */
+export type ChunkStatus = 'pending' | 'processing' | 'completed' | 'error' | 'retrying';
 
 export interface ChunkMetadata {
   id: number;
   startOffset: string; // e.g., "0s"
-  endOffset: string;   // e.g., "1500s"
+  endOffset: string; // e.g., "1500s"
   estimatedTokens: number;
   status: ChunkStatus;
   result?: ChunkAnalysis;
@@ -99,8 +106,8 @@ export interface Job {
   totalTokensUsed: number;
   retriesCount: number;
   startTime: string; // ISO 8601
-  endTime?: string;  // ISO 8601
-  result?: string;   // Final consolidated timestamp document
+  endTime?: string; // ISO 8601
+  result?: string; // Final consolidated timestamp document
   error?: string;
 }
 
@@ -111,7 +118,7 @@ export interface Job {
 export interface ApiKeyValidationResult {
   isValid: boolean;
   models?: string[];
-  tier?: 'free' | 'paid' | 'unknown';
+  tier?: Tier;
   tpm?: number; // Tokens per minute
   rpm?: number; // Requests per minute
   error?: string;
@@ -127,18 +134,18 @@ export interface JobCreationResult {
 // SSE Event Types
 // ============================================================================
 
-export type SSEEventType =
-  | 'job:status'
-  | 'chunk:update'
-  | 'concurrency:change'
-  | 'log'
-  | 'error';
+/**
+ * @public SSE event types - documents the Server-Sent Events protocol
+ */
+export type SSEEventType = 'job:status' | 'chunk:update' | 'concurrency:change' | 'log' | 'error';
 
+/** @public Base SSE event shape */
 export interface SSEEvent {
   type: SSEEventType;
   data: unknown;
 }
 
+/** @public Job status update event */
 export interface JobStatusEvent {
   type: 'job:status';
   data: {
@@ -151,6 +158,7 @@ export interface JobStatusEvent {
   };
 }
 
+/** @public Chunk processing update event */
 export interface ChunkUpdateEvent {
   type: 'chunk:update';
   data: {
@@ -162,6 +170,7 @@ export interface ChunkUpdateEvent {
   };
 }
 
+/** @public Concurrency change notification */
 export interface ConcurrencyChangeEvent {
   type: 'concurrency:change';
   data: {
@@ -171,6 +180,7 @@ export interface ConcurrencyChangeEvent {
   };
 }
 
+/** @public Log entry event */
 export interface LogEvent {
   type: 'log';
   data: JobLogEntry;
@@ -183,30 +193,7 @@ export interface LogEvent {
 export interface StoredApiKey {
   key: string;
   hash: string;
-  tier: 'free' | 'paid' | 'unknown';
+  tier: Tier;
   models: string[];
   expiresAt?: string; // ISO 8601
 }
-
-export interface CustomPrompt {
-  content: string;
-  modifiedAt: string; // ISO 8601
-}
-
-export interface StorageSchema {
-  apiKey?: StoredApiKey;
-  customPrompts?: Record<string, CustomPrompt>; // keyed by `${apiKeyHash}_${promptType}`
-}
-
-// ============================================================================
-// Utility Types
-// ============================================================================
-
-export interface TokenCalculation {
-  tokensPerSecond: number;
-  tokensPerChunk: number;
-  chunksPerMinute: number;
-  withinLimit: boolean;
-  warningMessage?: string;
-}
-

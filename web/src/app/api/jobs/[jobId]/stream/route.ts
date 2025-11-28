@@ -4,30 +4,32 @@
  */
 
 import { NextRequest } from 'next/server';
-import { getJob, getJobStats } from '@/lib/jobs';
+
 import { SSE_CONFIG } from '@/lib/constants';
+import { getJob, getJobStats } from '@/lib/jobs';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
   const { jobId } = await params;
-  console.log(`[GET /api/jobs/${jobId}/stream] SSE connection initiated`);
+  logger.debug('SSE', 'Connection initiated', { jobId });
 
   const job = getJob(jobId);
-  
+
   if (!job) {
-    console.error(`[GET /api/jobs/${jobId}/stream] Job not found`);
+    logger.warn('SSE', 'Job not found', { jobId });
     return new Response('Job not found', { status: 404 });
   }
 
-  console.log(`[GET /api/jobs/${jobId}/stream] Job found, starting SSE stream`);
+  logger.debug('SSE', 'Starting stream', { jobId });
 
   // Create readable stream for SSE
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
-      
+
       // Send initial state
       const sendUpdate = () => {
         const currentJob = getJob(jobId);
@@ -37,7 +39,7 @@ export async function GET(
         }
 
         const stats = getJobStats(jobId);
-        
+
         const event = {
           type: 'job:status',
           data: {
@@ -96,8 +98,7 @@ export async function GET(
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
     },
   });
 }
-

@@ -4,26 +4,25 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+
 import { getJob, getJobStats } from '@/lib/jobs';
+import { logger } from '@/lib/logger';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
   const { jobId } = await params;
-  console.log(`[GET /api/jobs/${jobId}] Fetching job status`);
+  logger.debug('API', 'Fetching job status', { jobId });
 
   const job = getJob(jobId);
-  
+
   if (!job) {
-    console.error(`[GET /api/jobs/${jobId}] Job not found`);
-    return NextResponse.json(
-      { error: 'Job not found' },
-      { status: 404 }
-    );
+    logger.warn('API', 'Job not found', { jobId });
+    return NextResponse.json({ error: 'Job not found' }, { status: 404 });
   }
 
-  console.log(`[GET /api/jobs/${jobId}] Job found, status: ${job.status}`);
+  logger.debug('API', 'Job found', { jobId, status: job.status });
   const stats = getJobStats(jobId);
 
   return NextResponse.json({
@@ -36,4 +35,3 @@ export async function GET(
     },
   });
 }
-

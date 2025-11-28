@@ -4,11 +4,11 @@
  * Results View Component
  * Displays final consolidated timestamps
  */
-
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle2, Copy, Download, Loader2, RotateCcw } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
-import { CheckCircle2, Copy, Download, RotateCcw, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import type { Job } from '@/types';
 
@@ -79,15 +79,15 @@ export function ResultsView({ jobId, onStartNew }: ResultsViewProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (!job || !job.result) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <Card className="max-w-md">
           <CardHeader>
             <CardTitle>No Results</CardTitle>
@@ -105,18 +105,14 @@ export function ResultsView({ jobId, onStartNew }: ResultsViewProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="max-w-4xl mx-auto space-y-6 py-8">
+      <div className="mx-auto max-w-4xl space-y-6 py-8">
         {/* Header */}
-        <div className="text-center space-y-2">
+        <div className="space-y-2 text-center">
           <div className="inline-flex items-center gap-2 text-green-600">
-            <CheckCircle2 className="w-8 h-8" />
-            <h1 className="text-3xl font-bold tracking-tight">
-              Complete!
-            </h1>
+            <CheckCircle2 className="h-8 w-8" />
+            <h1 className="text-3xl font-bold tracking-tight">Complete!</h1>
           </div>
-          <p className="text-muted-foreground">
-            Your timestamps are ready
-          </p>
+          <p className="text-muted-foreground">Your timestamps are ready</p>
         </div>
 
         {/* Stats Summary */}
@@ -129,17 +125,13 @@ export function ResultsView({ jobId, onStartNew }: ResultsViewProps) {
           </Card>
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-2xl font-bold">
-                {job.totalTokensUsed.toLocaleString()}
-              </div>
+              <div className="text-2xl font-bold">{job.totalTokensUsed.toLocaleString()}</div>
               <div className="text-xs text-muted-foreground">Tokens Used</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="text-2xl font-bold">
-                {job.retriesCount}
-              </div>
+              <div className="text-2xl font-bold">{job.retriesCount}</div>
               <div className="text-xs text-muted-foreground">Retries</div>
             </CardContent>
           </Card>
@@ -149,33 +141,31 @@ export function ResultsView({ jobId, onStartNew }: ResultsViewProps) {
         <Card>
           <CardHeader>
             <CardTitle>Final Timestamps</CardTitle>
-            <CardDescription>
-              Copy or download your generated timestamps
-            </CardDescription>
+            <CardDescription>Copy or download your generated timestamps</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Actions */}
             <div className="flex gap-2">
               <Button onClick={handleCopy} variant="outline" className="flex-1">
-                <Copy className="w-4 h-4" />
+                <Copy className="h-4 w-4" />
                 Copy to Clipboard
               </Button>
               <Button onClick={handleDownload} variant="outline" className="flex-1">
-                <Download className="w-4 h-4" />
+                <Download className="h-4 w-4" />
                 Download .txt
               </Button>
             </div>
 
             {/* Timestamps Text */}
             <div className="relative">
-              <pre className="p-4 bg-muted rounded-md text-sm overflow-x-auto whitespace-pre-wrap max-h-[600px] overflow-y-auto border">
+              <pre className="max-h-[600px] overflow-x-auto overflow-y-auto whitespace-pre-wrap rounded-md border bg-muted p-4 text-sm">
                 {job.result}
               </pre>
             </div>
 
             {/* Start New */}
             <Button onClick={onStartNew} className="w-full" size="lg">
-              <RotateCcw className="w-5 h-5" />
+              <RotateCcw className="h-5 w-5" />
               Process Another Video
             </Button>
           </CardContent>
@@ -184,5 +174,3 @@ export function ResultsView({ jobId, onStartNew }: ResultsViewProps) {
     </div>
   );
 }
-
-

@@ -1,0 +1,165 @@
+Timestamps
+[0:02] Topic #1: Nvidia RTX 5070 & AMD Radeon 9070/XT GPU Launches.
+   > 0:20 TechRadar article: Prebuilts are always superior (teaser).
+   > 0:43 Mozilla Firefox ToU rewritten & Dig's return (teaser).
+[0:59] Intro.
+[1:17] Sponsors.
+   > 1:26 Squarespace, Vessi, Corsair, dbrand, Dell & Secretlab.
+[Cont.] Topic #1: Nvidia RTX 5070 & AMD Radeon 9070/XT GPU Launches.
+   > 2:05 Nvidia RTX 5070 launch issues, performance & 12GB VRAM longevity concerns.
+   > 5:47 AMD Radeon 9070/9070 XT launch reception & performance.
+   > 7:14 AMD FSR4 image quality impressions.
+   > 7:31 MSRP & rebate pricing strategies in GPU launches.
+   > 8:42 Linus's retail experience with GPU pricing ambiguity.
+   > 13:48 Critique of 'introductory promo' pricing as MSRP.
+   > 15:00 Marketplace GPU pricing strategy discussions.
+   > 15:21 Historical GPU market fervor: 8800 GT launch.
+   > 15:36 The 8800 GT launch details & value proposition.
+   > 17:31 8800 GT price increase VS current practices.
+   > 18:29 Unprecedented modern GPU pricing mechanisms.
+   > 18:47 AMD's official statement on RX 7900 series pricing.
+   > 19:27 Premium card pricing & stretched price bands.
+   > 21:13 GPU pricing tangent & audience engagement check.
+   > 21:30 AMD's "strategic incompetence" in pricing.
+   > 22:04 Last-minute pricing information from AMD.
+   > 22:40 Partner challenges with last-minute pricing changes.
+   > 22:57 Best Buy pricing error for GPUs.
+   > 23:10 Board partner motivations: maximizing profit from demand.
+   > 23:20 AMD's leverage over AIBs & price control.
+   > 24:51 Risks of GPU maker control: EVGA example.
+   > 25:27 Micro Center priority & retail VS online allocation.
+   > 26:01 Unprecedented retail priority for GPU launches.
+   > 26:32 System integrator's over-MSRP cost for GPUs.
+   > 26:52 AMD's incomplete narrative on GPU pricing.
+   > 27:18 Rebates & spiffs required for "everyday prices".
+   > 27:42 Disparity in rebate access for retailers.
+   > 28:06 RX 9700 XT pricing matching 20% tariffs.
+   > 29:19 AMD knew about tariffs before MSRP announcement.
+   > 29:55 Apparent strategic pricing by AMD with tariff knowledge.
+   > 30:00 Linus's theory on AMD GPU pricing & tariffs.
+   > 30:57 Displaying tariff information to consumers.
+   > 33:14 AMD's intentions & naive hope regarding GPU prices.
+   > 35:22 Audience engagement check & topic conclusion.
+   > 35:39 GPU scarcity & marketing questions.
+   > 35:52 Refuting scarcity marketing claims for GPUs.
+   > 38:09 Financial risks for AIB partners with AMD GPUs.
+   > 40:20 AMD's wafer allocation & Nvidia's aggression.
+   > 41:50 AMD's past competitive performance & market outlook.
+   > 42:36 GPU discussion duration & host self-correction.
+[43:24] Merch Messages #1.
+   > 43:24 New 'Terminally Online' merch launch: hoodie & t-shirt.
+   > 45:00 Terminally Online merch details & pricing.
+   > 45:00 Costco hotdog reference & t-shirt pricing.
+   > 45:16 Threatening Nick with 'killing in Minecraft'.
+   > 45:39 LTTStore T-shirt pricing becoming unsustainable.
+   > 45:51 Expensive products & embroidered hoodie justification.
+   > 46:13 Challenge to find cheaper all-over embroidered garments.
+   > 46:34 Product pricing philosophy: Not overpriced but priced for what it is.
+   > 46:44 Terminally Online T-shirt value proposition.
+   > 46:57 New Terminally Online Hoodie features & price.
+   > 47:20 Product photo credit & continued discussion on embroidery.
+   > 47:35 Fair pricing for embroidered hoodies confirmed by expert.
+   > 47:59 Upcoming LTTStore inventory & 'tall blanks'.
+   > 48:36 Luke vows to 'race' the audience for tall blanks.
+   > 49:03 "Why is WAN Late" series announcement (Floatplane exclusive).
+   > 49:50 New Floatplane exclusive: LMG Members' First Meeting with Linus.
+   > 50:20 Corporate euphemisms: 'Custodian version of HR'.
+   > 50:41 How to send a Merch Message.
+   > 51:10 Question: Why remove old products from the website?.
+   > 51:46 Question: Accidental RX 6970 purchase for $650, keep or return?.
+   > 52:45 Linus's GPU upgrade strategy: Waiting for Ploop's preorder.
+[53:08] Topic #2: Linus's tech purchasing philosophy: Against scalped GPUs & high prices.
+   > 54:24 MacBook purchase timing regret: 'Suck it up crybaby' comments.
+   > 55:07 iPhone 16 Plus choice & tech review philosophy.
+   > 57:04 Reviewing products based on practical user recommendations.
+   > 57:51 Future 'meme' content & 'not a Tech Yacht'.
+[58:40] Sponsors.
+   > 58:40 Squarespace.
+   > 59:38 Vessi.
+   > 1:00:54 Corsair Frame 4000D PC Case.
+   > 1:01:50 WAN Show title & thumbnail suggestions.
+[1:02:08] Topic #3: Firefox Terms of Use rewritten after user backlash.
+   > 1:02:54 Mozilla's initial defense of Firefox Terms.
+   > 1:03:05 Firefox Product Chief announces rewritten terms.
+   > 1:03:26 Diligence in reading Terms of Service & licenses.
+   > 1:04:15 Discussion on Discord ownership & Chinese investment.
+   > 1:05:30 LTT's policy on restrictive sponsor contracts.
+   > 1:06:45 Challenges with providing early product feedback to companies.
+   > 1:08:35 Hypothetical conflict of interest in product reviews.
+   > 1:09:35 Frustrations with lawyers & boilerplate contracts.
+[1:10:48] Topic #4: Digg acquired & plans for revival.
+   > 1:11:12 Digg's rise & fall: The 2010 redesign catastrophe.
+   > 1:12:31 New Digg vision: AI for grunt work, humans for connection.
+   > 1:13:07 Uncertainty about AI content curation in new Digg.
+   > 1:13:57 Platform inertia & content dependency.
+   > 1:14:21 Momentum VS inertia in physics & platforms.
+   > 1:15:00 Further discussion on momentum VS inertia.
+[1:15:56] Topic #5: YouTube Premium Lite announced.
+   > 1:16:17 YouTube Premium Lite limitations.
+   > 1:16:44 Unclear value of YouTube Premium Lite.
+   > 1:17:07 Luke's concerns about unclear terms.
+   > 1:17:15 Music licensing impact on YouTube Premium Lite.
+[1:18:14] Topic #6: Correction: Placebo effect & cancer survival rates.
+   > 1:18:44 Clarified statement on placebo effect in cancer.
+   > 1:19:08 Denouncing scams.
+   > 1:19:20 WAN Show is not a medical podcast.
+   > 1:19:37 Positive outlook & patient compliance.
+[1:20:41] Topic #7: Microsoft testing free ad-supported Office Desktop Apps.
+   > 1:20:55 Ad-supported features of free Office apps.
+   > 1:21:29 Limitations of free Microsoft Office apps.
+   > 1:22:17 Alternative Office software discussion.
+[1:22:48] Topic #8: Wacky foldables & tech from Mobile World Congress.
+   > 1:23:42 Lenovo Thinkbook Flip AI Prototype.
+   > 1:24:05 Rating scale for new tech concepts.
+   > 1:25:18 Luke's rating for Thinkbook Flip AI Prototype.
+   > 1:26:14 Linus's rating for Thinkbook Flip AI Prototype.
+   > 1:26:30 Lenovo Magic Bay Dual Display Concept.
+   > 1:27:00 Magic Bay proprietary connection critique.
+   > 1:27:27 Luke's rating for Magic Bay concept.
+   > 1:27:37 Lenovo's business strategy VS individual users.
+   > 1:28:08 Lenovo Yoga Solar PC Concept.
+   > 1:28:25 Solar panel efficiency & practicality concerns.
+   > 1:28:58 Rating for Lenovo Yoga Solar PC Concept.
+   > 1:29:18 Outdoor use & sticker customization concerns.
+   > 1:29:51 IT conference laptop stickers discussion.
+   > 1:30:00 Chat & stickers banter.
+   > 1:30:06 Lenovo USB-C NPU AI Stick.
+   > 1:30:32 Rating the Lenovo USB-C AI Stick.
+   > 1:31:12 Infinix Zero Series Mini Tri-Fold Concept.
+   > 1:31:31 Rating the Infinix Tri-Fold Phone.
+   > 1:32:42 Infinix Solar Energy Reserving Technology.
+   > 1:33:39 Xiaomi Buds 5 Pro with Wi-Fi music streaming.
+   > 1:34:14 Rating Xiaomi Wi-Fi earbuds.
+   > 1:35:32 Samsung Flex Gaming Concept.
+   > 1:36:42 Critique of Samsung Flex Gaming Concept design.
+   > 1:37:56 Samsung Tri-Fold Smartphone Concept (Asymmetric Flip).
+   > 1:38:29 Critique of concept phone designs.
+[1:38:44] Topic #9: TechRadar article: Built VS Bought PC debate.
+   > 1:39:07 TechRadar's argument for pre-built PC superiority.
+   > 1:39:31 Pre-built PC advantages highlighted by TechRadar.
+   > 1:40:00 LTT's rebuttal to pre-built PC arguments.
+   > 1:40:45 Support & service as a pre-built advantage.
+   > 1:41:16 Critique of 'engineer' title for PC builders.
+[1:43:06] WAN After Dark transition.
+[1:43:38] Merch Messages #2.
+   > 1:43:38 Question: Not reviewing 12GB cards on 4K?.
+   > 1:43:55 12GB VRAM for 4K gaming discussion.
+[1:45:00] Topic #10: GPU review philosophy & 12GB cards for 4K gaming.
+[1:45:59] Merch Messages #3.
+   > 1:45:59 Question: Favorite Tape to Tape characters & perks.
+   > 1:46:04 Linus's 'broken' Tape to Tape run.
+   > 1:47:25 Linus's current 'super broken' Tape to Tape run.
+   > 1:47:59 Question: Do you still enjoy building PCs for yourself?.
+   > 1:48:09 Enjoyment of building unique PCs.
+   > 1:49:19 Building PCs VS troubleshooting.
+   > 1:49:28 Question: Travel destination you've never been to?.
+   > 1:49:40 Discussing Flathead Valley, Montana.
+   > 1:50:26 Luke's travel aspirations: Banff, Iceland & Greenland.
+   > 1:51:21 Linus's travel aspirations: Australia for scuba diving.
+   > 1:51:51 Question: Final Fantasy Tactics mods?.
+   > 1:52:05 Final Fantasy 6 mod & quality shift discussion.
+   > 1:53:36 Linus's experience with Final Fantasy Tactics mods.
+   > 1:54:40 XCOM: A genre fan's unplayed game.
+   > 1:55:27 XCOM's 99% miss rate & tactician's frustrations.
+   > 1:56:39 YouTube-ing Fantasian's final boss.
+[1:57:02] Outro.

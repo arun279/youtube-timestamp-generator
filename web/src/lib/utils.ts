@@ -1,5 +1,9 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+import type { MediaResolutionType } from '@/types';
+
+import { TOKEN_CONSTANTS } from './constants';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,31 +17,50 @@ export async function hashString(str: string): Promise<string> {
   const data = encoder.encode(str);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 /**
  * Calculate tokens for video processing
- * Based on Gemini API token calculations
+ * Based on official Gemini API documentation:
+ * https://ai.google.dev/gemini-api/docs/media-resolution
+ *
+ * Formula: tokensPerSecond = (fps × tokensPerFrame) + audioTokensPerSecond
+ *
+ * For Gemini 2.5:
+ * - LOW: 64 tokens/frame
+ * - MEDIUM: 256 tokens/frame
+ * - HIGH: 256 tokens/frame
+ * - Audio: 32 tokens/second (always)
  */
 export function calculateTokens(
   durationSeconds: number,
   fps: number,
-  resolution: 'low' | 'default'
+  resolution: MediaResolutionType
 ): {
   tokensPerSecond: number;
   totalTokens: number;
+  breakdown: {
+    videoTokensPerSecond: number;
+    audioTokensPerSecond: number;
+    tokensPerFrame: number;
+  };
 } {
-  // Token rates from Gemini docs
-  const baseTokensPerSecond = resolution === 'low' ? 98 : 263;
-  
-  // FPS adjustment (proportional)
-  const fpsMultiplier = fps / 1.0; // 1.0 FPS is the baseline
-  
-  const tokensPerSecond = baseTokensPerSecond * fpsMultiplier;
+  const tokensPerFrame = TOKEN_CONSTANTS.tokensPerFrame[resolution];
+  const audioTokensPerSecond = TOKEN_CONSTANTS.audioTokensPerSecond;
+  const videoTokensPerSecond = fps * tokensPerFrame;
+  const tokensPerSecond = videoTokensPerSecond + audioTokensPerSecond;
   const totalTokens = Math.ceil(tokensPerSecond * durationSeconds);
 
-  return { tokensPerSecond, totalTokens };
+  return {
+    tokensPerSecond,
+    totalTokens,
+    breakdown: {
+      videoTokensPerSecond,
+      audioTokensPerSecond,
+      tokensPerFrame,
+    },
+  };
 }
 
 /**
@@ -57,15 +80,27 @@ export function extractYouTubeId(url: string): string | null {
   ];
 
   for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) return match[1];
+    const match = pattern.exec(url);
+    if (match?.[1]) return match[1];
   }
 
   return null;
 }
 
 /**
+ * Normalize YouTube URL to canonical form
+ * Strips query parameters and returns: https://www.youtube.com/watch?v=VIDEO_ID
+ */
+export function normalizeYouTubeUrl(url: string): string | null {
+  const videoId = extractYouTubeId(url);
+  if (!videoId) return null;
+
+  return `https://www.youtube.com/watch?v=${videoId}`;
+}
+
+/**
  * Format seconds to HH:MM:SS
+ * @public
  */
 export function formatTimestamp(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
@@ -81,13 +116,19 @@ export function formatTimestamp(seconds: number): string {
 
 /**
  * Parse HH:MM:SS to seconds
+ * @public
  */
 export function parseTimestamp(timestamp: string): number {
   const parts = timestamp.split(':').map(Number);
-  if (parts.length === 3) {
+  if (
+    parts.length === 3 &&
+    parts[0] !== undefined &&
+    parts[1] !== undefined &&
+    parts[2] !== undefined
+  ) {
     return parts[0] * 3600 + parts[1] * 60 + parts[2];
   }
-  if (parts.length === 2) {
+  if (parts.length === 2 && parts[0] !== undefined && parts[1] !== undefined) {
     return parts[0] * 60 + parts[1];
   }
   return 0;
@@ -117,7 +158,7 @@ export function generateChunks(
   durationSeconds: number,
   chunkSizeMinutes: number,
   fps: number,
-  resolution: 'low' | 'default'
+  resolution: MediaResolutionType
 ): Array<{
   id: number;
   startOffset: string;
@@ -147,6 +188,7 @@ export function generateChunks(
 
 /**
  * Calculate ETA based on progress
+ * @public
  */
 export function calculateETA(
   completedChunks: number,
@@ -154,37 +196,9 @@ export function calculateETA(
   elapsedMs: number
 ): number | null {
   if (completedChunks === 0) return null;
-  
+
   const avgTimePerChunk = elapsedMs / completedChunks;
   const remainingChunks = totalChunks - completedChunks;
-  
+
   return Math.ceil((avgTimePerChunk * remainingChunks) / 1000); // seconds
 }
-
-/**
- * Sanitize user input for prompts (prevent XSS)
- */
-export function sanitizePrompt(prompt: string): string {
-  // Remove script tags and potentially dangerous content
-  return prompt
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-    .replace(/javascript:/gi, '')
-    .trim();
-}
-
-/**
- * Debounce function for search/input
- */
-export function debounce<T extends (...args: unknown[]) => unknown>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
-  
-  return (...args: Parameters<T>) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
-}
-
