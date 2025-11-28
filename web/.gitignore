@@ -34,6 +34,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# generated
-/src/lib/prompts/defaults.ts
+# generated (by scripts/load-prompts.ts from /prompts/*/*.md)
+/src/lib/prompts/registry.ts
 

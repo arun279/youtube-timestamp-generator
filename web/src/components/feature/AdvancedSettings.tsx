@@ -8,9 +8,17 @@
  * https://ai.google.dev/gemini-api/docs/media-resolution
  */
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { TOKEN_CONSTANTS } from '@/lib/constants';
+import { getPromptPairOrDefault, getPromptPairs } from '@/lib/prompts/registry';
 import type { ApiKeyValidationResult, MediaResolutionType, ProcessingConfig } from '@/types';
 
 interface AdvancedSettingsProps {
@@ -60,6 +68,10 @@ export function AdvancedSettings({
     onChange({ ...config, ...updates });
   };
 
+  // Get available prompts and current selection
+  const promptPairs = getPromptPairs();
+  const currentPrompt = getPromptPairOrDefault(config.promptId);
+
   // Calculate tokens/second for current settings
   const currentFps = config.fps || 0.5;
   const currentResolution = config.resolution || 'low';
@@ -72,6 +84,31 @@ export function AdvancedSettings({
     <div className="space-y-4 rounded-md border bg-muted/30 p-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">Advanced Settings</h3>
+      </div>
+
+      <Separator />
+
+      {/* Prompt Template Selector */}
+      <div className="space-y-2">
+        <Label className="text-xs font-medium">Prompt Template</Label>
+        <Select
+          value={currentPrompt.id}
+          onValueChange={(value: string) => updateConfig({ promptId: value })}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a prompt template" />
+          </SelectTrigger>
+          <SelectContent>
+            {promptPairs.map((prompt) => (
+              <SelectItem key={prompt.id} value={prompt.id}>
+                {prompt.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {currentPrompt.description && (
+          <p className="text-xs text-muted-foreground">{currentPrompt.description}</p>
+        )}
       </div>
 
       <Separator />

@@ -33,7 +33,7 @@ import {
   updateJobStatus,
 } from './jobs';
 import { logger } from './logger';
-import { DEFAULT_PROMPTS } from './prompts/defaults';
+import { getPromptPairOrDefault } from './prompts/registry';
 import { AdaptiveRateLimiter, getRateLimits } from './rate-limits';
 import { calculateTokens } from './utils';
 
@@ -238,12 +238,16 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
     return;
   }
 
+  // Get prompt pair (uses default if not specified or not found)
+  const promptPair = getPromptPairOrDefault(job.config.promptId);
+
   logger.info('ProcessVideo', 'Starting job processing', {
     jobId,
     chunkCount: job.chunks.length,
     resolution: job.config.resolution,
     fps: job.config.fps,
     chunkSizeMinutes: job.config.chunkSize,
+    promptId: promptPair.id,
   });
 
   // Create failure tracker for this job
@@ -301,7 +305,7 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
               videoUrl: job.config.videoUrl,
               startOffset: chunk.startOffset,
               endOffset: chunk.endOffset,
-              prompt: DEFAULT_PROMPTS.chunkAnalysis,
+              prompt: promptPair.chunkAnalysis,
               fps: job.config.fps,
               resolution: job.config.resolution,
               model: job.config.model,
@@ -436,12 +440,12 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
       consolidationTokens = await countConsolidationTokens(
         apiKey,
         chunkResults,
-        DEFAULT_PROMPTS.consolidation,
+        promptPair.consolidation,
         job.config.model
       );
     } catch {
       // Fallback: estimate ~4 chars per token
-      const consolidationInput = `${DEFAULT_PROMPTS.consolidation}\n\n${JSON.stringify(chunkResults)}`;
+      const consolidationInput = `${promptPair.consolidation}\n\n${JSON.stringify(chunkResults)}`;
       consolidationTokens = Math.ceil(consolidationInput.length / 4);
     }
 
@@ -466,7 +470,7 @@ export async function processVideoInBackground(jobId: string, apiKey: string): P
         const { text, usageMetadata } = await consolidateChunks(
           apiKey,
           chunkResults,
-          DEFAULT_PROMPTS.consolidation,
+          promptPair.consolidation,
           job.config.model
         );
 

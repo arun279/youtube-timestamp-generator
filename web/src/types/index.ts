@@ -31,6 +31,8 @@ export const ProcessingConfigSchema = z.object({
   tier: Tier.default('free'),
   concurrencyMode: z.enum(['adaptive', 'manual']).default('adaptive'),
   manualConcurrency: z.number().min(1).max(10).optional(),
+  /** Prompt pair ID - uses default if not specified */
+  promptId: z.string().optional(),
 });
 
 export type ProcessingConfig = z.infer<typeof ProcessingConfigSchema>;
