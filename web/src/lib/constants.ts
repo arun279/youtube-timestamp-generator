@@ -131,6 +131,25 @@ export function calculateTotalTokens(
   return Math.ceil(tokensPerSecond * durationSeconds);
 }
 
+/**
+ * Default processing configuration values
+ * Used to ensure consistency across InputSection and other components
+ */
+export const DEFAULT_CONFIG = {
+  /** Default chunk size in minutes (15 min for safety margin with free tier) */
+  chunkSize: 15,
+  /** Default frames per second for video analysis */
+  fps: 0.5,
+  /** Default resolution for video analysis */
+  resolution: 'low' as const,
+  /** Default Gemini model */
+  model: 'gemini-2.5-flash',
+  /** Default tier */
+  tier: 'free' as const,
+  /** Default concurrency mode */
+  concurrencyMode: 'adaptive' as const,
+} as const;
+
 // Storage keys
 export const STORAGE_KEYS = {
   apiKey: 'ytts_api_key',

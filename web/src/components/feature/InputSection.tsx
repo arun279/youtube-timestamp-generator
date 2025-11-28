@@ -5,14 +5,16 @@
  * Allows user to input YouTube URL and configure processing settings
  */
 import { useState } from 'react';
-import { AlertCircle, Loader2, Play, Settings2, Youtube } from 'lucide-react';
+import { AlertCircle, Loader2, Play, Settings2 } from 'lucide-react';
 
 import { createProcessingJob } from '@/app/actions/create-job';
+import { YouTubeIcon } from '@/components/icons/youtube';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useYouTubeDuration } from '@/hooks/use-youtube-duration';
+import { DEFAULT_CONFIG } from '@/lib/constants';
 import { ApiKeyStorage } from '@/lib/storage';
 import { formatDuration, normalizeYouTubeUrl } from '@/lib/utils';
 import type { ApiKeyValidationResult, ProcessingConfig } from '@/types';
@@ -21,8 +23,8 @@ import { AdvancedSettings } from './AdvancedSettings';
 import { TokenCalculator } from './TokenCalculator';
 
 interface InputSectionProps {
-  apiKeyInfo: ApiKeyValidationResult;
-  onStart: (jobId: string) => void;
+  readonly apiKeyInfo: ApiKeyValidationResult;
+  readonly onStart: (jobId: string) => void;
 }
 
 export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
@@ -31,14 +33,15 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Configuration state - defaults optimized for free tier
+  // Configuration state - defaults from constants (optimized for free tier)
+  // promptId is undefined by default, which uses the default prompt
   const [config, setConfig] = useState<Partial<ProcessingConfig>>({
-    chunkSize: 15, // 15 min default for safety margin
-    fps: 0.5,
-    resolution: 'low', // Low resolution for faster processing
-    model: 'gemini-2.5-flash',
-    tier: 'free',
-    concurrencyMode: 'adaptive',
+    chunkSize: DEFAULT_CONFIG.chunkSize,
+    fps: DEFAULT_CONFIG.fps,
+    resolution: DEFAULT_CONFIG.resolution,
+    model: DEFAULT_CONFIG.model,
+    tier: DEFAULT_CONFIG.tier,
+    concurrencyMode: DEFAULT_CONFIG.concurrencyMode,
   });
 
   // Get video duration
@@ -69,12 +72,13 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
 
       const fullConfig: ProcessingConfig = {
         videoUrl: normalizedUrl,
-        chunkSize: config.chunkSize || 15,
-        fps: config.fps || 0.5,
-        resolution: config.resolution || 'low',
-        model: config.model || 'gemini-2.5-flash',
-        tier: config.tier || 'free',
-        concurrencyMode: config.concurrencyMode || 'adaptive',
+        chunkSize: config.chunkSize ?? DEFAULT_CONFIG.chunkSize,
+        fps: config.fps ?? DEFAULT_CONFIG.fps,
+        resolution: config.resolution ?? DEFAULT_CONFIG.resolution,
+        model: config.model ?? DEFAULT_CONFIG.model,
+        tier: config.tier ?? DEFAULT_CONFIG.tier,
+        concurrencyMode: config.concurrencyMode ?? DEFAULT_CONFIG.concurrencyMode,
+        promptId: config.promptId, // Pass through if set in advanced settings
       };
 
       const result = await createProcessingJob(fullConfig, apiKey, duration);
@@ -100,7 +104,7 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
           <Label htmlFor="url">YouTube URL</Label>
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Youtube className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <YouTubeIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="url"
                 type="url"
@@ -158,11 +162,11 @@ export function InputSection({ apiKeyInfo, onStart }: InputSectionProps) {
         {duration && (
           <TokenCalculator
             duration={duration}
-            chunkSize={config.chunkSize || 15}
-            fps={config.fps || 0.5}
-            resolution={config.resolution || 'low'}
-            model={config.model || 'gemini-2.5-flash'}
-            tier={config.tier || 'free'}
+            chunkSize={config.chunkSize ?? DEFAULT_CONFIG.chunkSize}
+            fps={config.fps ?? DEFAULT_CONFIG.fps}
+            resolution={config.resolution ?? DEFAULT_CONFIG.resolution}
+            model={config.model ?? DEFAULT_CONFIG.model}
+            tier={config.tier ?? DEFAULT_CONFIG.tier}
           />
         )}
 
